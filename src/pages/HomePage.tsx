@@ -18,19 +18,6 @@ export default function HomePage() {
           {pageMeta.subtitle}
         </p>
 
-        <div className="mt-6 grid grid-cols-3 gap-3 sm:mt-8 sm:gap-4">
-          {[
-            ['15 道题', '剧情式情景题'],
-            ['22 角色', '国民剧角色池'],
-            ['4 页面', '封面→答题→过渡→结果'],
-          ].map(([value, label]) => (
-            <div key={value} className="rounded-xl border border-white/10 bg-white/5 p-3 sm:rounded-2xl sm:p-4">
-              <p className="text-lg font-semibold text-white sm:text-2xl">{value}</p>
-              <p className="mt-1 text-xs text-stone-300 sm:mt-2 sm:text-sm">{label}</p>
-            </div>
-          ))}
-        </div>
-
         <div className="mt-6 flex flex-wrap gap-3 sm:mt-8">
           <Link
             to="/quiz"

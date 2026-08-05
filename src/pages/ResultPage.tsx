@@ -105,6 +105,8 @@ export default function ResultPage() {
         roleName={primaryRole.name}
         roleSource={primaryRole.source}
         similarity={similarityScore}
+        dimensions={archetypeDimensions}
+        loveView="他习惯用解决问题的方式回应你的情绪，表面体面周全，但在需要真正暴露脆弱或承担冲突时，更倾向于退一步维护秩序。爱的方式偏理性、偏安排，浪漫是有的，但持续性和主动性不够稳定。"
       />
     </div>
   );
