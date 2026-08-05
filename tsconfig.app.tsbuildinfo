@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/main.tsx","./src/components/ProgressHeader.tsx","./src/lib/quiz-config.ts","./src/lib/types.ts","./src/pages/HomePage.tsx","./src/pages/LoadingPage.tsx","./src/pages/QuizPage.tsx","./src/pages/ResultPage.tsx"],"version":"5.9.3"}
