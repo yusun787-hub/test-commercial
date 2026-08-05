@@ -24,13 +24,19 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
   const dataPoints = dimensions.map((d, i) => getPoint(i, d.value / 10));
   const dataPath = dataPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
 
+  // 该角色均值参考线（各维度平均分对应的正多边形）
+  const avgValue = dimensions.reduce((sum, d) => sum + d.value, 0) / dimensions.length;
+  const avgPoints = Array.from({ length: count }, (_, i) => getPoint(i, avgValue / 10));
+  const avgPath = avgPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
+
   // 找出最低分维度
   const minIndex = dimensions.reduce((minI, d, i, arr) => (d.value < arr[minI].value ? i : minI), 0);
 
   return (
     <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-6">
       {/* SVG 雷达图 */}
-      <svg viewBox="0 0 240 240" className="h-48 w-48 shrink-0 sm:h-56 sm:w-56">
+      <div className="flex flex-col items-center">
+        <svg viewBox="0 0 240 240" className="h-48 w-48 shrink-0 sm:h-56 sm:w-56">
         {/* 网格 */}
         {gridLevels.map((level) => {
           const points = Array.from({ length: count }, (_, i) => getPoint(i, level));
@@ -46,6 +52,9 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
 
         {/* 数据区域 */}
         <path d={dataPath} fill="rgba(244,114,182,0.2)" stroke="rgba(244,114,182,0.7)" strokeWidth="2" />
+
+        {/* 该角色均值参考线 */}
+        <path d={avgPath} fill="none" stroke="rgba(148,163,184,0.8)" strokeWidth="1.5" strokeDasharray="4 3" />
 
         {/* 数据点 */}
         {dataPoints.map((p, i) => (
@@ -69,6 +78,19 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
           );
         })}
       </svg>
+
+        {/* 图例 */}
+        <div className="mt-2 flex items-center gap-4 text-[10px] text-stone-400 sm:text-xs">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-rose-300" />
+            这个角色
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <span className="h-0 w-3 border-t-2 border-dashed border-slate-400" />
+            角色均值 {avgValue.toFixed(1)}
+          </span>
+        </div>
+      </div>
 
       {/* 维度解读 */}
       <div className="flex-1 space-y-2.5">

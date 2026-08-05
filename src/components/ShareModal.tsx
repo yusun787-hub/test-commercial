@@ -32,6 +32,11 @@ function MiniRadar({ dimensions }: { dimensions: Dimension[] }) {
   const dataPoints = dimensions.map((d, i) => getPoint(i, d.value / 10));
   const dataPath = dataPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
 
+  // 该角色均值参考线
+  const avgValue = dimensions.reduce((sum, d) => sum + d.value, 0) / dimensions.length;
+  const avgPoints = Array.from({ length: count }, (_, i) => getPoint(i, avgValue / 10));
+  const avgPath = avgPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
+
   return (
     <svg viewBox="0 0 160 160" className="h-32 w-32">
       {gridLevels.map((level) => {
@@ -44,6 +49,7 @@ function MiniRadar({ dimensions }: { dimensions: Dimension[] }) {
         return <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />;
       })}
       <path d={dataPath} fill="rgba(244,114,182,0.25)" stroke="rgba(244,114,182,0.8)" strokeWidth="1.5" />
+      <path d={avgPath} fill="none" stroke="rgba(148,163,184,0.7)" strokeWidth="1" strokeDasharray="3 2" />
       {dataPoints.map((p, i) => (
         <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="#f472b6" />
       ))}
