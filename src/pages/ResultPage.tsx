@@ -10,13 +10,14 @@ const primaryRole = roleHighlights[1]; // 示例主角色
 const similarityScore = 83;
 
 // 模拟关系原型维度数据
+// value: 本次测评得分；roleAvg: 该角色（陈俊生·体面逃避型）固定基准均值，来自角色标签表，不随测评结果变化
 const archetypeDimensions = [
-  { label: '情绪价值', value: 4, description: '不太会主动提供情绪支持，多用道理回应你的感受。' },
-  { label: '责任感', value: 6, description: '事业上有担当，但在关系细节中容易掉线。' },
-  { label: '边界感', value: 3, description: '与外界关系暧昧，给人不够明确的距离信号。' },
-  { label: '稳定性', value: 5, description: '情绪整体平稳，但压力大时可能选择回避。' },
-  { label: '浪漫感', value: 7, description: '偶尔会制造仪式感，但持续性一般。' },
-  { label: '现实感', value: 8, description: '对生活规划清晰，做事讲效率和体面。' },
+  { label: '情绪价值', value: 4, roleAvg: 5, description: '不太会主动提供情绪支持，多用道理回应你的感受。' },
+  { label: '责任感', value: 6, roleAvg: 6, description: '事业上有担当，但在关系细节中容易掉线。' },
+  { label: '边界感', value: 3, roleAvg: 4, description: '与外界关系暧昧，给人不够明确的距离信号。' },
+  { label: '稳定性', value: 5, roleAvg: 5, description: '情绪整体平稳，但压力大时可能选择回避。' },
+  { label: '浪漫感', value: 7, roleAvg: 6, description: '偶尔会制造仪式感，但持续性一般。' },
+  { label: '现实感', value: 8, roleAvg: 7, description: '对生活规划清晰，做事讲效率和体面。' },
 ];
 
 export default function ResultPage() {

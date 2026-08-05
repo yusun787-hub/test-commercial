@@ -1,5 +1,5 @@
 interface RadarChartProps {
-  dimensions: { label: string; value: number; description: string }[];
+  dimensions: { label: string; value: number; roleAvg: number; description: string }[];
 }
 
 export default function RadarChart({ dimensions }: RadarChartProps) {
@@ -20,13 +20,12 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
   // 背景网格层级
   const gridLevels = [0.25, 0.5, 0.75, 1];
 
-  // 数据多边形路径
+  // 测评结果多边形路径
   const dataPoints = dimensions.map((d, i) => getPoint(i, d.value / 10));
   const dataPath = dataPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
 
-  // 该角色均值参考线（各维度平均分对应的正多边形）
-  const avgValue = dimensions.reduce((sum, d) => sum + d.value, 0) / dimensions.length;
-  const avgPoints = Array.from({ length: count }, (_, i) => getPoint(i, avgValue / 10));
+  // 角色均值参考线（该角色各维度的固定基准分，非当次测评计算得出）
+  const avgPoints = dimensions.map((d, i) => getPoint(i, d.roleAvg / 10));
   const avgPath = avgPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
 
   // 找出最低分维度
@@ -37,57 +36,57 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
       {/* SVG 雷达图 */}
       <div className="flex flex-col items-center">
         <svg viewBox="0 0 240 240" className="h-48 w-48 shrink-0 sm:h-56 sm:w-56">
-        {/* 网格 */}
-        {gridLevels.map((level) => {
-          const points = Array.from({ length: count }, (_, i) => getPoint(i, level));
-          const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
-          return <path key={level} d={path} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />;
-        })}
+          {/* 网格 */}
+          {gridLevels.map((level) => {
+            const points = Array.from({ length: count }, (_, i) => getPoint(i, level));
+            const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
+            return <path key={level} d={path} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />;
+          })}
 
-        {/* 轴线 */}
-        {dimensions.map((_, i) => {
-          const p = getPoint(i, 1);
-          return <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />;
-        })}
+          {/* 轴线 */}
+          {dimensions.map((_, i) => {
+            const p = getPoint(i, 1);
+            return <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />;
+          })}
 
-        {/* 数据区域 */}
-        <path d={dataPath} fill="rgba(244,114,182,0.2)" stroke="rgba(244,114,182,0.7)" strokeWidth="2" />
+          {/* 测评结果区域 */}
+          <path d={dataPath} fill="rgba(244,114,182,0.2)" stroke="rgba(244,114,182,0.7)" strokeWidth="2" />
 
-        {/* 该角色均值参考线 */}
-        <path d={avgPath} fill="none" stroke="rgba(148,163,184,0.8)" strokeWidth="1.5" strokeDasharray="4 3" />
+          {/* 角色均值参考线 */}
+          <path d={avgPath} fill="none" stroke="rgba(148,163,184,0.8)" strokeWidth="1.5" strokeDasharray="4 3" />
 
-        {/* 数据点 */}
-        {dataPoints.map((p, i) => (
-          <circle key={i} cx={p.x} cy={p.y} r="4" fill={i === minIndex ? '#fbbf24' : '#f472b6'} />
-        ))}
+          {/* 数据点 */}
+          {dataPoints.map((p, i) => (
+            <circle key={i} cx={p.x} cy={p.y} r="4" fill={i === minIndex ? '#fbbf24' : '#f472b6'} />
+          ))}
 
-        {/* 标签 */}
-        {dimensions.map((d, i) => {
-          const labelPoint = getPoint(i, 1.2);
-          return (
-            <text
-              key={i}
-              x={labelPoint.x}
-              y={labelPoint.y}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              className="fill-stone-300 text-[9px] sm:text-[10px]"
-            >
-              {d.label}
-            </text>
-          );
-        })}
-      </svg>
+          {/* 标签 */}
+          {dimensions.map((d, i) => {
+            const labelPoint = getPoint(i, 1.2);
+            return (
+              <text
+                key={i}
+                x={labelPoint.x}
+                y={labelPoint.y}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="fill-stone-300 text-[9px] sm:text-[10px]"
+              >
+                {d.label}
+              </text>
+            );
+          })}
+        </svg>
 
         {/* 图例 */}
         <div className="mt-2 flex items-center gap-4 text-[10px] text-stone-400 sm:text-xs">
           <span className="inline-flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-rose-300" />
-            这个角色
+            测评结果
           </span>
           <span className="inline-flex items-center gap-1.5">
             <span className="h-0 w-3 border-t-2 border-dashed border-slate-400" />
-            角色均值 {avgValue.toFixed(1)}
+            角色均值
           </span>
         </div>
       </div>
@@ -99,7 +98,7 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
             <div className="flex items-center justify-between gap-2">
               <span className="text-sm font-medium text-white">{d.label}</span>
               <span className={`text-xs font-medium ${i === minIndex ? 'text-amber-300' : 'text-rose-200'}`}>
-                {d.value}/10
+                {d.value * 10}%
               </span>
             </div>
             <p className="mt-1 text-xs leading-5 text-stone-400">{d.description}</p>

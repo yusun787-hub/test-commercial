@@ -3,6 +3,7 @@ import { Download, X } from 'lucide-react';
 interface Dimension {
   label: string;
   value: number;
+  roleAvg: number;
   description: string;
 }
 
@@ -32,9 +33,8 @@ function MiniRadar({ dimensions }: { dimensions: Dimension[] }) {
   const dataPoints = dimensions.map((d, i) => getPoint(i, d.value / 10));
   const dataPath = dataPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
 
-  // 该角色均值参考线
-  const avgValue = dimensions.reduce((sum, d) => sum + d.value, 0) / dimensions.length;
-  const avgPoints = Array.from({ length: count }, (_, i) => getPoint(i, avgValue / 10));
+  // 角色均值参考线（固定基准分，非当次测评计算得出）
+  const avgPoints = dimensions.map((d, i) => getPoint(i, d.roleAvg / 10));
   const avgPath = avgPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
 
   return (
@@ -102,8 +102,18 @@ export default function ShareModal({ open, onClose, roleName, roleSource, simila
           </div>
 
           {/* 雷达图 */}
-          <div className="mt-4 flex justify-center">
+          <div className="mt-4 flex flex-col items-center">
             <MiniRadar dimensions={dimensions} />
+            <div className="mt-1.5 flex items-center gap-3 text-[9px] text-stone-500">
+              <span className="inline-flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-rose-300" />
+                测评结果
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span className="h-0 w-2.5 border-t border-dashed border-slate-400" />
+                角色均值
+              </span>
+            </div>
           </div>
 
           {/* 维度得分简表 */}
@@ -111,7 +121,7 @@ export default function ShareModal({ open, onClose, roleName, roleSource, simila
             {dimensions.map((d) => (
               <div key={d.label} className="rounded-lg bg-white/5 px-2 py-1.5 text-center">
                 <p className="text-[10px] text-stone-400">{d.label}</p>
-                <p className="text-xs font-semibold text-rose-100">{d.value}/10</p>
+                <p className="text-xs font-semibold text-rose-100">{d.value * 10}%</p>
               </div>
             ))}
           </div>
