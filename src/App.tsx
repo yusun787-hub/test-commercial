@@ -20,7 +20,7 @@ function AppShell() {
       {/* 顶部导航 - 移动端精简 */}
       <header className="sticky top-0 z-20 border-b border-white/10 bg-stone-950/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2.5 sm:px-5 sm:py-3">
-          <p className="text-xs font-medium tracking-wide text-stone-300 sm:text-sm">人生测测局</p>
+          <p className="text-xs font-medium tracking-wide text-stone-300 sm:text-sm">蓝瞳测评局</p>
           <nav className="flex items-center gap-1.5 sm:gap-2">
             {navItems.map(({ to, label, icon: Icon }) => {
               const active = location.pathname === to;

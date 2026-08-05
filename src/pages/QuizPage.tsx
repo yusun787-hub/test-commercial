@@ -1,5 +1,6 @@
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ProgressHeader from '../components/ProgressHeader';
 import { sampleQuestions } from '../lib/quiz-config';
 
@@ -7,6 +8,16 @@ export default function QuizPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedMap, setSelectedMap] = useState<Record<number, string>>({});
   const currentQuestion = sampleQuestions[currentIndex];
+  const isLastQuestion = currentIndex === sampleQuestions.length - 1;
+  const navigate = useNavigate();
+
+  const handleNext = () => {
+    if (isLastQuestion) {
+      navigate('/loading');
+    } else {
+      setCurrentIndex((v) => v + 1);
+    }
+  };
 
   return (
     <div className="flex min-h-[calc(100dvh-4rem)] flex-col px-4 py-4 sm:px-6 sm:py-6">
@@ -67,12 +78,20 @@ export default function QuizPage() {
 
           <button
             type="button"
-            onClick={() => setCurrentIndex((v) => Math.min(sampleQuestions.length - 1, v + 1))}
-            className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-2.5 text-sm font-medium text-stone-950 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-40 sm:gap-2 sm:px-4 sm:py-3"
-            disabled={currentIndex === sampleQuestions.length - 1}
+            onClick={handleNext}
+            className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-2.5 text-sm font-medium text-stone-950 transition hover:bg-rose-100 sm:gap-2 sm:px-4 sm:py-3"
           >
-            下一题
-            <ArrowRight className="h-4 w-4" />
+            {isLastQuestion ? (
+              <>
+                揭晓答案
+                <Sparkles className="h-4 w-4" />
+              </>
+            ) : (
+              <>
+                下一题
+                <ArrowRight className="h-4 w-4" />
+              </>
+            )}
           </button>
         </div>
       </section>
