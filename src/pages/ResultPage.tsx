@@ -1,30 +1,37 @@
 import { BadgeHelp, RefreshCcw, Share2 } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import RadarChart from '../components/RadarChart';
 import ShareModal from '../components/ShareModal';
-import { roleHighlights } from '../lib/quiz-config';
+import { calculateQuizResult } from '../lib/quiz-config';
 
-const primaryRole = roleHighlights[1]; // 示例主角色
+const ANSWER_STORAGE_KEY = 'tv-character-quiz-answers';
 
-// 模拟相似度（70~100），后续接入真实计算
-const similarityScore = 83;
-
-// 模拟关系原型维度数据
-// value: 本次测评得分；roleAvg: 该角色（陈俊生·体面逃避型）固定基准均值，来自角色标签表，不随测评结果变化
-const archetypeDimensions = [
-  { label: '情绪价值', value: 4, roleAvg: 5, description: '不太会主动提供情绪支持，多用道理回应你的感受。' },
-  { label: '责任感', value: 6, roleAvg: 6, description: '事业上有担当，但在关系细节中容易掉线。' },
-  { label: '边界感', value: 3, roleAvg: 4, description: '与外界关系暧昧，给人不够明确的距离信号。' },
-  { label: '稳定性', value: 5, roleAvg: 5, description: '情绪整体平稳，但压力大时可能选择回避。' },
-  { label: '浪漫感', value: 7, roleAvg: 6, description: '偶尔会制造仪式感，但持续性一般。' },
-  { label: '现实感', value: 8, roleAvg: 7, description: '对生活规划清晰，做事讲效率和体面。' },
-];
+function getStoredAnswers() {
+  try {
+    const raw = sessionStorage.getItem(ANSWER_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as Record<number, string>) : {};
+  } catch {
+    return {};
+  }
+}
 
 export default function ResultPage() {
   const [showShareModal, setShowShareModal] = useState(false);
+  const location = useLocation();
+  const selectedMap = (location.state as { selectedMap?: Record<number, string> } | null)?.selectedMap ?? getStoredAnswers();
+  const result = useMemo(() => calculateQuizResult(selectedMap), [selectedMap]);
+  const { role: primaryRole, profile, similarity, answeredCount } = result;
+  const archetypeDimensions = profile.dimensions;
 
   return (
     <div className="space-y-5 px-4 py-4 sm:space-y-6 sm:px-6 sm:py-6">
+      {answeredCount === 0 && (
+        <section className="rounded-[1.5rem] border border-amber-200/20 bg-amber-200/10 p-4 text-sm leading-6 text-amber-50 backdrop-blur-xl">
+          还没有检测到本次答题记录，当前展示的是默认结果示例。想体验真实测评，请从首页重新开始答题。
+        </section>
+      )}
+
       {/* 主结果卡片 */}
       <section className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-violet-200/15 via-stone-950/10 to-rose-200/15 p-6 shadow-2xl shadow-black/30 backdrop-blur-xl sm:rounded-[2.25rem] sm:p-8">
         <p className="text-xs uppercase tracking-[0.2em] text-stone-400 sm:text-sm sm:tracking-[0.3em]">你的结果</p>
@@ -35,8 +42,8 @@ export default function ResultPage() {
 
         {/* 相似度 - 胶囊文字样式 */}
         <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-rose-200/30 bg-rose-200/10 px-4 py-2">
-          <span className="text-sm font-semibold text-rose-100">MATCH {similarityScore}%</span>
-          <span className="text-xs text-stone-400">based on this session</span>
+          <span className="text-sm font-semibold text-rose-100">MATCH {similarity}%</span>
+          <span className="text-xs text-stone-400">基于本次 {answeredCount || 24} 题选择</span>
         </div>
 
         <p className="mt-4 text-base leading-7 text-stone-200/85 sm:text-lg sm:leading-8">
@@ -65,14 +72,12 @@ export default function ResultPage() {
       <section className="grid gap-4 sm:gap-6 sm:grid-cols-3">
         <article className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl sm:rounded-[2rem] sm:p-6">
           <p className="text-sm font-medium text-stone-300">结果解析</p>
-          <p className="mt-3 text-sm leading-7 text-stone-400">
-            这里后面会接入：高分题命中说明、关系原型得分、对应剧情行为解释。当前先把结果页模块结构搭出来。
-          </p>
+          <p className="mt-3 text-sm leading-7 text-stone-400">{profile.analysis}</p>
         </article>
 
         <article className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl sm:rounded-[2rem] sm:p-6">
           <p className="text-sm font-medium text-stone-300">TA的恋爱观</p>
-          <p className="mt-3 text-sm leading-7 text-stone-400">这里后面会放"他在剧里是怎么处理亲密关系的"，让结果更有画面感。</p>
+          <p className="mt-3 text-sm leading-7 text-stone-400">{profile.partnerView}</p>
         </article>
 
         <article className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl sm:rounded-[2rem] sm:p-6">
@@ -80,7 +85,7 @@ export default function ResultPage() {
             <BadgeHelp className="h-4 w-4" />
             继续探索
           </div>
-          <p className="mt-3 text-sm leading-7 text-stone-400">这里预留给相似角色、角色池入口和后续转化模块。首版先保证分享体验干净。</p>
+          <p className="mt-3 text-sm leading-7 text-stone-400">{profile.exploration}</p>
         </article>
       </section>
 
@@ -93,10 +98,13 @@ export default function ResultPage() {
           <Share2 className="h-4 w-4" />
           生成分享图
         </button>
-        <button className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/10">
+        <Link
+          to="/quiz"
+          className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/10"
+        >
           <RefreshCcw className="h-4 w-4" />
           再测一个人
-        </button>
+        </Link>
       </div>
 
       {/* 分享弹窗 */}
@@ -105,9 +113,9 @@ export default function ResultPage() {
         onClose={() => setShowShareModal(false)}
         roleName={primaryRole.name}
         roleSource={primaryRole.source}
-        similarity={similarityScore}
+        similarity={similarity}
         dimensions={archetypeDimensions}
-        loveView="他习惯用解决问题的方式回应你的情绪，表面体面周全，但在需要真正暴露脆弱或承担冲突时，更倾向于退一步维护秩序。爱的方式偏理性、偏安排，浪漫是有的，但持续性和主动性不够稳定。"
+        loveView={profile.loveView}
       />
     </div>
   );

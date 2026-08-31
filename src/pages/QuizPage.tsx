@@ -4,16 +4,22 @@ import { useNavigate } from 'react-router-dom';
 import ProgressHeader from '../components/ProgressHeader';
 import { sampleQuestions } from '../lib/quiz-config';
 
+const ANSWER_STORAGE_KEY = 'tv-character-quiz-answers';
+
 export default function QuizPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedMap, setSelectedMap] = useState<Record<number, string>>({});
   const currentQuestion = sampleQuestions[currentIndex];
+  const currentAnswer = selectedMap[currentQuestion.id];
   const isLastQuestion = currentIndex === sampleQuestions.length - 1;
   const navigate = useNavigate();
 
   const handleNext = () => {
+    if (!currentAnswer) return;
+
     if (isLastQuestion) {
-      navigate('/loading');
+      sessionStorage.setItem(ANSWER_STORAGE_KEY, JSON.stringify(selectedMap));
+      navigate('/loading', { state: { selectedMap } });
     } else {
       setCurrentIndex((v) => v + 1);
     }
@@ -79,7 +85,8 @@ export default function QuizPage() {
           <button
             type="button"
             onClick={handleNext}
-            className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-2.5 text-sm font-medium text-stone-950 transition hover:bg-rose-100 sm:gap-2 sm:px-4 sm:py-3"
+            disabled={!currentAnswer}
+            className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-2.5 text-sm font-medium text-stone-950 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-40 sm:gap-2 sm:px-4 sm:py-3"
           >
             {isLastQuestion ? (
               <>

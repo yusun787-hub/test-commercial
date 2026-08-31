@@ -47,8 +47,8 @@ export default function HomePage() {
           </div>
         </div>
         <ul className="mt-4 space-y-2 text-sm leading-7 text-stone-300">
-          <li>• 下一步：接入完整 15 题题库与 22 角色映射配置</li>
-          <li>• 再下一步：接 Supabase 记录结果与埋点</li>
+          <li>• 当前版本：已接入完整 24 题题库与真实结果计算</li>
+          <li>• 下一步：接 Supabase 记录结果与埋点</li>
         </ul>
       </div>
     </div>
