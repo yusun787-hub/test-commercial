@@ -1,6 +1,125 @@
 import type { Archetype, QuizQuestion, RoleSummary } from './types';
 
+const ALL_ARCHETYPES: Archetype[] = [
+  '稳定照顾型',
+  '能扛事推进型',
+  '温柔守护型',
+  '温柔但没结果型',
+  '体面逃避型',
+  '强势控制型',
+  '现实算计型',
+];
+
+function stableHash(input: string) {
+  // 轻量稳定 hash：同样的答题组合 → 同样的结果
+  let hash = 5381;
+  for (let i = 0; i < input.length; i += 1) {
+    hash = (hash * 33) ^ input.charCodeAt(i);
+  }
+  return hash >>> 0;
+}
+
+function buildAnswerSeed(selectedMap: Record<number, string>) {
+  return Object.entries(selectedMap)
+    .sort((a, b) => Number(a[0]) - Number(b[0]))
+    .map(([questionId, optionId]) => `${questionId}:${optionId}`)
+    .join('|');
+}
+
 export const roleHighlights: RoleSummary[] = [
+  // 甄嬛传
+  {
+    id: 'zhen-huan',
+    name: '甄嬛',
+    source: '《甄嬛传》',
+    archetype: '现实算计型',
+    title: '清醒会布局的长期主义者',
+    tags: ['清醒', '会权衡', '能翻盘'],
+    oneLiner: 'TA不轻易上头，但会把你放进自己的人生盘面里。',
+    riskHint: '理性太强时，容易让人觉得自己在被评估。',
+  },
+  {
+    id: 'guo-junwang',
+    name: '果郡王（允礼）',
+    source: '《甄嬛传》',
+    archetype: '温柔守护型',
+    title: '克制又深情的守护派',
+    tags: ['深情', '克制', '会记得'],
+    oneLiner: 'TA的喜欢不吵闹，却会在你最无助时出现。',
+    riskHint: '太克制时，你可能等不到明确答案。',
+  },
+  {
+    id: 'wen-shichu',
+    name: '温实初',
+    source: '《甄嬛传》',
+    archetype: '温柔但没结果型',
+    title: '把喜欢藏进照顾里的人',
+    tags: ['温柔', '会照顾', '不敢说'],
+    oneLiner: 'TA会对你好到让你心软，却可能在关键节点犹豫。',
+    riskHint: '别用“被照顾”替代“被选择”。',
+  },
+  {
+    id: 'shen-meizhuang',
+    name: '沈眉庄',
+    source: '《甄嬛传》',
+    archetype: '稳定照顾型',
+    title: '稳重自持的安全感',
+    tags: ['自律', '靠谱', '有分寸'],
+    oneLiner: 'TA不太会甜，但会把日子过得稳。',
+    riskHint: '太讲分寸时，浪漫感会偏弱。',
+  },
+  {
+    id: 'hua-fei',
+    name: '华妃（年世兰）',
+    source: '《甄嬛传》',
+    archetype: '强势控制型',
+    title: '爱得浓烈也爱得强势',
+    tags: ['强烈', '占有', '护短'],
+    oneLiner: 'TA会把偏爱给到极致，也会希望你只围着TA转。',
+    riskHint: '上头很快，边界也要更清楚。',
+  },
+  {
+    id: 'empress-yixiu',
+    name: '皇后（宜修）',
+    source: '《甄嬛传》',
+    archetype: '体面逃避型',
+    title: '很会维持体面，但情绪常在暗处',
+    tags: ['体面', '压抑', '不摊牌'],
+    oneLiner: 'TA擅长把关系过成规矩，却不一定愿意坦白脆弱。',
+    riskHint: '表面平静，不代表问题被处理。',
+  },
+  {
+    id: 'yongzheng',
+    name: '雍正（胤禛）',
+    source: '《甄嬛传》',
+    archetype: '强势控制型',
+    title: '标准强、节奏快的掌控者',
+    tags: ['强势', '高标准', '难取悦'],
+    oneLiner: 'TA会给你资源与位置，也会对你有更高要求。',
+    riskHint: '别把控制当成安全感。',
+  },
+  {
+    id: 'ye-lanyi',
+    name: '叶澜依',
+    source: '《甄嬛传》',
+    archetype: '能扛事推进型',
+    title: '敢爱敢恨的行动派',
+    tags: ['果断', '护短', '敢翻桌'],
+    oneLiner: 'TA不怕麻烦，会带着你把局面往前推。',
+    riskHint: '情绪来得快时，沟通需要降温。',
+  },
+
+  // 知否
+  {
+    id: 'sheng-minglan',
+    name: '盛明兰',
+    source: '《知否》',
+    archetype: '现实算计型',
+    title: '清醒又能落地的经营型',
+    tags: ['清醒', '会算账', '能共事'],
+    oneLiner: 'TA的爱很务实：一起把日子过好，才算真的在一起。',
+    riskHint: '太会算时，甜度可能不够。',
+  },
   {
     id: 'gu-tingye',
     name: '顾廷烨',
@@ -8,68 +127,130 @@ export const roleHighlights: RoleSummary[] = [
     archetype: '能扛事推进型',
     title: '关键时刻会顶上的推进派',
     tags: ['靠谱', '会扛事', '现实感强'],
-    oneLiner: '嘴不一定甜，但真出事时他会站出来。',
+    oneLiner: '嘴不一定甜，但真出事时TA会站出来。',
     riskHint: '容易用解决问题替代情绪安抚。',
   },
   {
-    id: 'chen-junsheng',
-    name: '陈俊生',
-    source: '《我的前半生》',
-    archetype: '体面逃避型',
-    title: '看上去温和，关键处却会退的人',
-    tags: ['体面', '摇摆', '掉线'],
-    oneLiner: '不是大坏人，但会慢慢把人耗累。',
-    riskHint: '愧疚不等于真正担当。',
-  },
-  {
-    id: 'xie-zhiyao',
-    name: '谢之遥',
-    source: '《去有风的地方》',
-    archetype: '稳定照顾型',
-    title: '适合长期相处的稳定派',
-    tags: ['稳定', '松弛', '有边界'],
-    oneLiner: '不刺激，但会让人慢慢安稳下来。',
-    riskHint: '太克制时会显得不够上头。',
-  },
-  {
-    id: 'he-yichen',
-    name: '何以琛',
-    source: '《何以笙箫默》',
-    archetype: '温柔守护型',
-    title: '外冷内热、长期守候的守护派',
-    tags: ['专一', '克制', '守护感'],
-    oneLiner: '表达不多，但会把你放进很长远的计划里。',
-    riskHint: '太能忍时，也会让误会被拖得很久。',
-  },
-  {
-    id: 'li-xun',
-    name: '李峋',
-    source: '《点燃我，温暖你》',
-    archetype: '强势控制型',
-    title: '很有吸引力，也很有压迫感的主导派',
-    tags: ['强势', '锋利', '上头'],
-    oneLiner: '他会带你冲，但也容易让关系围着他的节奏转。',
-    riskHint: '吸引力很强，但需要警惕控制感和情绪压迫。',
-  },
-  {
-    id: 'fan-xian',
-    name: '范闲',
-    source: '《庆余年》',
-    archetype: '现实算计型',
-    title: '清醒权衡、会算账也会护短的现实派',
-    tags: ['聪明', '权衡', '现实'],
-    oneLiner: '他懂浪漫，也懂局势，爱里常常带着判断。',
-    riskHint: '太会权衡时，容易让人觉得自己只是局中一环。',
-  },
-  {
-    id: 'li-daqi',
-    name: '李大齐',
-    source: '《粉红女郎》',
+    id: 'qi-heng',
+    name: '齐衡',
+    source: '《知否》',
     archetype: '温柔但没结果型',
-    title: '让人心软，却不一定能走到底的温柔派',
-    tags: ['温柔', '暧昧', '不确定'],
-    oneLiner: '他会给你很多柔软瞬间，但未必给得出明确未来。',
-    riskHint: '别把一时温柔误认成长期承诺。',
+    title: '温柔到让人舍不得怪',
+    tags: ['温柔', '体面', '不敢破局'],
+    oneLiner: 'TA喜欢你是真的，但常常被现实和顾虑拉住。',
+    riskHint: '别把“舍不得”当成“会选择”。',
+  },
+  {
+    id: 'he-hongwen',
+    name: '贺弘文',
+    source: '《知否》',
+    archetype: '温柔守护型',
+    title: '把你放在心里慢慢护着',
+    tags: ['温和', '尊重', '不逼迫'],
+    oneLiner: 'TA愿意听你说完，也愿意在你需要时站到你这边。',
+    riskHint: '节奏偏慢，需要你确认你要不要等。',
+  },
+  {
+    id: 'sheng-zhangbai',
+    name: '盛长柏',
+    source: '《知否》',
+    archetype: '稳定照顾型',
+    title: '讲原则、也能扛起家的稳定派',
+    tags: ['稳重', '有担当', '边界清'],
+    oneLiner: 'TA不太会说漂亮话，但会把你放进长期安排。',
+    riskHint: '表达偏直时，容易显得不够浪漫。',
+  },
+  {
+    id: 'liang-han',
+    name: '梁晗',
+    source: '《知否》',
+    archetype: '体面逃避型',
+    title: '会哄也会躲的体面派',
+    tags: ['嘴甜', '摇摆', '怕承担'],
+    oneLiner: 'TA能把气氛做得很好，却不一定愿意扛后果。',
+    riskHint: '最危险的是：你以为被爱，其实只是被哄。',
+  },
+  {
+    id: 'zhu-manniang',
+    name: '朱曼娘',
+    source: '《知否》',
+    archetype: '强势控制型',
+    title: '会拿捏人心的操控型浪漫',
+    tags: ['会演', '上头', '拿捏'],
+    oneLiner: 'TA很懂你的软肋，也很会让你为TA破例。',
+    riskHint: '如果你总在解释自己，可能已经被带节奏。',
+  },
+
+  // 还珠格格
+  {
+    id: 'xiao-yanzi',
+    name: '小燕子',
+    source: '《还珠格格》',
+    archetype: '能扛事推进型',
+    title: '冲在前面的热血行动派',
+    tags: ['直球', '护短', '敢闯'],
+    oneLiner: 'TA会把你拉进热闹人生，也会在你受委屈时第一个站出来。',
+    riskHint: '冲动时容易先做后想。',
+  },
+  {
+    id: 'ziwei',
+    name: '紫薇',
+    source: '《还珠格格》',
+    archetype: '温柔守护型',
+    title: '细腻坚定的守护派',
+    tags: ['细腻', '坚定', '会沟通'],
+    oneLiner: 'TA不吵不闹，却能在关键时刻把你护住。',
+    riskHint: '太顾全别人时，容易委屈自己。',
+  },
+  {
+    id: 'yongqi',
+    name: '永琪（五阿哥）',
+    source: '《还珠格格》',
+    archetype: '能扛事推进型',
+    title: '肯为你扛事的热血担当',
+    tags: ['担当', '敢选', '会行动'],
+    oneLiner: 'TA认定了就会往前走，愿意把压力挡在你前面。',
+    riskHint: '热血之外，也要看长期的现实安排。',
+  },
+  {
+    id: 'er-kang',
+    name: '福尔康',
+    source: '《还珠格格》',
+    archetype: '温柔守护型',
+    title: '把你当成唯一的守护派',
+    tags: ['坚定', '护短', '忠诚'],
+    oneLiner: 'TA会在你不被理解时站在你这一边。',
+    riskHint: '过度“替你做主”时也可能变成压力。',
+  },
+  {
+    id: 'qing-er',
+    name: '晴儿',
+    source: '《还珠格格》',
+    archetype: '稳定照顾型',
+    title: '温柔有分寸的长期主义',
+    tags: ['温柔', '有分寸', '情绪稳'],
+    oneLiner: 'TA能照顾你的情绪，也能守住自己的边界。',
+    riskHint: '太克制时，你可能感受不到热烈。',
+  },
+  {
+    id: 'jin-suo',
+    name: '金锁',
+    source: '《还珠格格》',
+    archetype: '稳定照顾型',
+    title: '细水长流的陪伴者',
+    tags: ['忠诚', '踏实', '会照顾'],
+    oneLiner: 'TA不抢戏，但会在你身边把小事都做妥。',
+    riskHint: '别让TA的付出变成理所当然。',
+  },
+  {
+    id: 'meng-dan',
+    name: '蒙丹',
+    source: '《还珠格格》',
+    archetype: '温柔但没结果型',
+    title: '很上头，但不一定能落地的浪漫派',
+    tags: ['热烈', '冲动', '戏剧感'],
+    oneLiner: 'TA爱得很直接，像一阵风把你卷走。',
+    riskHint: '热烈不等于稳定，别忽略现实代价。',
   },
 ];
 
@@ -81,7 +262,7 @@ export const archetypeProfiles: Record<Archetype, {
   dimensions: { label: string; value: number; roleAvg: number; description: string }[];
 }> = {
   稳定照顾型: {
-    loveView: '他习惯先让关系回到安全区，再一起解决问题。爱的方式不一定轰轰烈烈，但会体现在稳定回应、尊重边界和持续陪伴里。',
+    loveView: 'TA习惯先让关系回到安全区，再一起解决问题。爱的方式不一定轰轰烈烈，但会体现在稳定回应、尊重边界和持续陪伴里。',
     analysis: '你的选择集中在情绪承接、边界透明和稳定行动上，说明你更容易被“让人安心”的相处方式打动。',
     partnerView: 'TA 的恋爱观偏长期主义：少一点戏剧化，多一点真实生活里的照顾和可靠。',
     exploration: '如果想继续验证，可以观察 TA 在压力、冲突和异性边界里的连续表现。',
@@ -95,10 +276,10 @@ export const archetypeProfiles: Record<Archetype, {
     ],
   },
   能扛事推进型: {
-    loveView: '他爱一个人的方式偏行动派：遇事先站出来，把问题拆开、往前推。缺点是有时太快进入解决模式，忘了你此刻更需要被理解。',
+    loveView: 'TA爱一个人的方式偏行动派：遇事先站出来，把问题拆开、往前推。缺点是有时太快进入解决模式，忘了你此刻更需要被理解。',
     analysis: '你的答案更偏向“关键时刻是否靠得住”，你看重担当、执行力和冲突后的修复能力。',
     partnerView: 'TA 的恋爱观是一起过日子、一起打仗，安全感来自行动而不是甜言蜜语。',
-    exploration: '建议留意他是否能在解决问题之外，也愿意停下来听你的感受。',
+    exploration: '建议留意TA是否能在解决问题之外，也愿意停下来听你的感受。',
     dimensions: [
       { label: '情绪价值', value: 6, roleAvg: 6, description: '会关心你，但常常用方案代替安慰。' },
       { label: '责任感', value: 9, roleAvg: 9, description: '关键问题上有承担，不容易把你丢下。' },
@@ -109,7 +290,7 @@ export const archetypeProfiles: Record<Archetype, {
     ],
   },
   温柔守护型: {
-    loveView: '他把喜欢藏在长期陪伴里，不一定高调，却会记得你的习惯、替你留位置，也愿意在你需要时默默出现。',
+    loveView: 'TA把喜欢藏在长期陪伴里，不一定高调，却会记得你的习惯、替你留位置，也愿意在你需要时默默出现。',
     analysis: '你的选择更看重专一、耐心和细水长流的守护感，说明你对关系里的“被放在心上”非常敏感。',
     partnerView: 'TA 的恋爱观偏深情和克制：不轻易开始，但开始后会很认真。',
     exploration: '需要确认的是，克制背后是成熟，还是不擅长沟通导致的距离感。',
@@ -123,10 +304,10 @@ export const archetypeProfiles: Record<Archetype, {
     ],
   },
   温柔但没结果型: {
-    loveView: '他会给你很多被喜欢的瞬间，但当关系需要确定答案、承担成本时，又容易停在暧昧和犹豫里。',
+    loveView: 'TA会给你很多被喜欢的瞬间，但当关系需要确定答案、承担成本时，又容易停在暧昧和犹豫里。',
     analysis: '你的答案里出现了较多“有感受但无推进”的信号，说明这段关系可能好嗑，但不一定好落地。',
     partnerView: 'TA 的恋爱观重感觉、重当下，也可能害怕承诺改变现有生活。',
-    exploration: '下一步最该看的不是他温不温柔，而是他是否愿意把你放进明确计划。',
+    exploration: '下一步最该看的不是TA温不温柔，而是TA是否愿意把你放进明确计划。',
     dimensions: [
       { label: '情绪价值', value: 7, roleAvg: 7, description: '会提供温柔回应，但稳定性不足。' },
       { label: '责任感', value: 4, roleAvg: 4, description: '遇到承诺和现实推进时容易迟疑。' },
@@ -137,7 +318,7 @@ export const archetypeProfiles: Record<Archetype, {
     ],
   },
   体面逃避型: {
-    loveView: '他习惯用解决问题的方式回应你的情绪，表面体面周全，但在需要真正暴露脆弱或承担冲突时，更倾向于退一步维护秩序。',
+    loveView: 'TA习惯用解决问题的方式回应你的情绪，表面体面周全，但在需要真正暴露脆弱或承担冲突时，更倾向于退一步维护秩序。',
     analysis: '你的答案较多指向“表面温和、关键处掉线”，这类关系容易让人说不出大错，却长期感到疲惫。',
     partnerView: 'TA 的恋爱观偏体面和低冲突：能维持关系外壳，但不一定愿意处理深层问题。',
     exploration: '建议重点观察冲突后的复盘质量，以及同类问题是否反复发生。',
@@ -151,10 +332,10 @@ export const archetypeProfiles: Record<Archetype, {
     ],
   },
   强势控制型: {
-    loveView: '他存在感强、决策快，也可能让你短时间很上头。但当他的节奏压过你的感受，关系就容易从保护感变成控制感。',
+    loveView: 'TA存在感强、决策快，也可能让你短时间很上头。但当TA的节奏压过你的感受，关系就容易从保护感变成控制感。',
     analysis: '你的答案集中在主导、压制和高吸引力信号上，说明这段关系可能强烈，但也需要更高的边界意识。',
-    partnerView: 'TA 的恋爱观偏掌控和占有：爱你，也希望关系按他的方式运行。',
-    exploration: '建议认真区分“有主见”和“不尊重”，尤其看他是否允许你说不。',
+    partnerView: 'TA 的恋爱观偏掌控和占有：爱你，也希望关系按TA的方式运行。',
+    exploration: '建议认真区分“有主见”和“不尊重”，尤其看TA是否允许你说不。',
     dimensions: [
       { label: '情绪价值', value: 3, roleAvg: 3, description: '不太习惯承接情绪，更容易给判断。' },
       { label: '责任感', value: 7, roleAvg: 7, description: '会承担，但常带着强主导。' },
@@ -165,10 +346,10 @@ export const archetypeProfiles: Record<Archetype, {
     ],
   },
   现实算计型: {
-    loveView: '他很清醒，会把感情放进现实局势里判断。优点是成熟、有规划，风险是你可能分不清自己是被爱着，还是被安排着。',
+    loveView: 'TA很清醒，会把感情放进现实局势里判断。优点是成熟、有规划，风险是你可能分不清自己是被爱着，还是被安排着。',
     analysis: '你的选择明显偏向权衡、资源、体面和收益判断，说明这类关系里理性成分会很重。',
     partnerView: 'TA 的恋爱观偏现实主义：喜欢是真的，但选择也要合算、可控、能落地。',
-    exploration: '建议观察他在利益冲突时，是优先保护关系，还是优先保护自己的最优解。',
+    exploration: '建议观察TA在利益冲突时，是优先保护关系，还是优先保护自己的最优解。',
     dimensions: [
       { label: '情绪价值', value: 5, roleAvg: 5, description: '会照顾感受，但不会让感受压过判断。' },
       { label: '责任感', value: 7, roleAvg: 7, description: '承担建立在成本可控和目标明确之上。' },
@@ -448,8 +629,8 @@ export const sampleQuestions: QuizQuestion[] = [
 ];
 
 export function calculateQuizResult(selectedMap: Record<number, string>) {
-  const scores = roleHighlights.reduce<Record<Archetype, number>>((acc, role) => {
-    acc[role.archetype] = 0;
+  const scores = ALL_ARCHETYPES.reduce<Record<Archetype, number>>((acc, archetype) => {
+    acc[archetype] = 0;
     return acc;
   }, {} as Record<Archetype, number>);
 
@@ -463,7 +644,13 @@ export function calculateQuizResult(selectedMap: Record<number, string>) {
 
   const sortedArchetypes = Object.entries(scores).sort((a, b) => b[1] - a[1]) as [Archetype, number][];
   const [topArchetype, topScore] = sortedArchetypes[0];
-  const role = roleHighlights.find((item) => item.archetype === topArchetype) ?? roleHighlights[0];
+
+  // 同一原型下支持多个角色：用“答题组合”做稳定分流，让结果更丰富
+  const candidates = roleHighlights.filter((item) => item.archetype === topArchetype);
+  const seed = `${topArchetype}|${buildAnswerSeed(selectedMap)}`;
+  const index = candidates.length ? stableHash(seed) % candidates.length : 0;
+  const role = (candidates.length ? candidates[index] : roleHighlights[0]) ?? roleHighlights[0];
+
   const answeredCount = Object.keys(selectedMap).length;
   const similarity = Math.min(96, Math.max(68, Math.round((topScore / Math.max(answeredCount, 1)) * 100)));
 
@@ -478,5 +665,5 @@ export function calculateQuizResult(selectedMap: Record<number, string>) {
 
 export const pageMeta = {
   title: '看看你的另一半是电视剧里的谁',
-  subtitle: '24 道剧情题，测出他的关系原型与电视剧角色结果。',
+  subtitle: '24 道剧情题，测出 TA 的关系原型，并匹配《甄嬛传》《知否》《还珠格格》里的 22 个角色。',
 };
