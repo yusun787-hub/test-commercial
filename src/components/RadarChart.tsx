@@ -28,8 +28,10 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
   const avgPoints = dimensions.map((d, i) => getPoint(i, d.roleAvg / 10));
   const avgPath = avgPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
 
-  // 找出最低分维度
-  const minIndex = dimensions.reduce((minI, d, i, arr) => (d.value < arr[minI].value ? i : minI), 0);
+  // 找出最高分维度，作为本次测评的最优势维度
+  const maxIndex = dimensions.reduce((maxI, d, i, arr) => (d.value > arr[maxI].value ? i : maxI), 0);
+  const maxPoint = dataPoints[maxIndex];
+  const maxDimension = dimensions[maxIndex];
 
   return (
     <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-6">
@@ -57,8 +59,22 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
 
           {/* 数据点 */}
           {dataPoints.map((p, i) => (
-            <circle key={i} cx={p.x} cy={p.y} r="4" fill={i === minIndex ? '#fbbf24' : '#f472b6'} />
+            <circle key={i} cx={p.x} cy={p.y} r={i === maxIndex ? '6' : '4'} fill={i === maxIndex ? '#fbbf24' : '#f472b6'} />
           ))}
+
+          {/* 最优势维度标注 */}
+          <g>
+            <circle cx={maxPoint.x} cy={maxPoint.y} r="11" fill="none" stroke="#fbbf24" strokeWidth="2" opacity="0.75" />
+            <text
+              x={maxPoint.x}
+              y={Math.max(14, maxPoint.y - 16)}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="fill-amber-200 text-[9px] font-semibold sm:text-[10px]"
+            >
+              最优势 · {maxDimension.label}
+            </text>
+          </g>
 
           {/* 标签 */}
           {dimensions.map((d, i) => {
@@ -94,16 +110,16 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
       {/* 维度解读 */}
       <div className="flex-1 space-y-2.5">
         {dimensions.map((d, i) => (
-          <div key={d.label} className={`rounded-xl p-3 ${i === minIndex ? 'border border-amber-400/30 bg-amber-400/10' : 'bg-white/5'}`}>
+          <div key={d.label} className={`rounded-xl p-3 ${i === maxIndex ? 'border border-amber-400/30 bg-amber-400/10' : 'bg-white/5'}`}>
             <div className="flex items-center justify-between gap-2">
               <span className="text-sm font-medium text-white">{d.label}</span>
-              <span className={`text-xs font-medium ${i === minIndex ? 'text-amber-300' : 'text-rose-200'}`}>
+              <span className={`text-xs font-medium ${i === maxIndex ? 'text-amber-300' : 'text-rose-200'}`}>
                 {d.value * 10}%
               </span>
             </div>
             <p className="mt-1 text-xs leading-5 text-stone-400">{d.description}</p>
-            {i === minIndex && (
-              <p className="mt-1 text-xs font-medium text-amber-300">⚠️ 这块你最容易被卡住</p>
+            {i === maxIndex && (
+              <p className="mt-1 text-xs font-medium text-amber-300">🌟 这是 TA 最突出的优势项</p>
             )}
           </div>
         ))}

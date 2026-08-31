@@ -1,4 +1,4 @@
-import { BadgeHelp, RefreshCcw, Share2 } from 'lucide-react';
+import { RefreshCcw, Share2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import RadarChart from '../components/RadarChart';
@@ -68,8 +68,8 @@ export default function ResultPage() {
         </div>
       </section>
 
-      {/* 底部三栏 */}
-      <section className="grid gap-4 sm:gap-6 sm:grid-cols-3">
+      {/* 底部两栏 */}
+      <section className="grid gap-4 sm:gap-6 sm:grid-cols-2">
         <article className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl sm:rounded-[2rem] sm:p-6">
           <p className="text-sm font-medium text-stone-300">结果解析</p>
           <p className="mt-3 text-sm leading-7 text-stone-400">{profile.analysis}</p>
@@ -78,14 +78,6 @@ export default function ResultPage() {
         <article className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl sm:rounded-[2rem] sm:p-6">
           <p className="text-sm font-medium text-stone-300">TA的恋爱观</p>
           <p className="mt-3 text-sm leading-7 text-stone-400">{profile.partnerView}</p>
-        </article>
-
-        <article className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl sm:rounded-[2rem] sm:p-6">
-          <div className="inline-flex items-center gap-2 text-sm font-medium text-stone-300">
-            <BadgeHelp className="h-4 w-4" />
-            继续探索
-          </div>
-          <p className="mt-3 text-sm leading-7 text-stone-400">{profile.exploration}</p>
         </article>
       </section>
 
