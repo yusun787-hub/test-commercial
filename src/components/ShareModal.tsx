@@ -126,9 +126,9 @@ export default function ShareModal({ open, onClose, roleName, roleSource, simila
             ))}
           </div>
 
-          {/* TA的恋爱观 */}
+          {/* 他的恋爱观 */}
           <div className="mt-4 rounded-xl bg-white/70 p-3">
-            <p className="text-[10px] font-medium text-slate-500">TA的恋爱观</p>
+            <p className="text-[10px] font-medium text-slate-500">他的恋爱观</p>
             <p className="mt-1.5 text-xs leading-5 text-slate-600">{loveView}</p>
           </div>
 

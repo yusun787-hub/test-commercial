@@ -62,7 +62,7 @@ export default function ResultPage() {
       {/* 关系原型得分 - 雷达图模块 */}
       <section className="rounded-[1.5rem] border border-white/70 bg-white/55 p-5 backdrop-blur-xl sm:rounded-[2rem] sm:p-6">
         <p className="text-sm font-medium text-slate-700">关系原型得分</p>
-        <p className="mt-1 text-xs text-slate-500">基于你的答题数据，对 TA 在关系中的表现做多维度评估</p>
+        <p className="mt-1 text-xs text-slate-500">基于你的答题数据，对他在关系中的表现做多维度评估</p>
         <div className="mt-5">
           <RadarChart dimensions={archetypeDimensions} />
         </div>
@@ -76,7 +76,7 @@ export default function ResultPage() {
         </article>
 
         <article className="rounded-[1.5rem] border border-white/70 bg-white/55 p-5 backdrop-blur-xl sm:rounded-[2rem] sm:p-6">
-          <p className="text-sm font-medium text-slate-700">TA的恋爱观</p>
+          <p className="text-sm font-medium text-slate-700">他的恋爱观</p>
           <p className="mt-3 text-sm leading-7 text-slate-600">{profile.partnerView}</p>
         </article>
       </section>

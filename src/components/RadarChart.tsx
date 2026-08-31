@@ -109,7 +109,7 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
             </div>
             <p className="mt-1 text-xs leading-5 text-slate-500">{d.description}</p>
             {i === maxIndex && (
-              <p className="mt-1 text-xs font-medium text-pink-600">🌟 这是 TA 最突出的优势项</p>
+              <p className="mt-1 text-xs font-medium text-pink-600">🌟 这是他最突出的优势项</p>
             )}
           </div>
         ))}
