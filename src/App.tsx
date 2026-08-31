@@ -16,11 +16,11 @@ function AppShell() {
   ];
 
   return (
-    <div className="min-h-dvh text-stone-100">
+    <div className="min-h-dvh text-slate-700">
       {/* 顶部导航 - 移动端精简 */}
-      <header className="sticky top-0 z-20 border-b border-white/10 bg-stone-950/80 backdrop-blur-xl">
+      <header className="sticky top-0 z-20 border-b border-sky-200/60 bg-white/70 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2.5 sm:px-5 sm:py-3">
-          <p className="text-xs font-medium tracking-wide text-stone-300 sm:text-sm">蓝瞳测评局</p>
+          <p className="text-xs font-medium tracking-wide text-slate-500 sm:text-sm">蓝瞳测评局</p>
           <nav className="flex items-center gap-1.5 sm:gap-2">
             {navItems.map(({ to, label, icon: Icon }) => {
               const active = location.pathname === to;
@@ -30,8 +30,8 @@ function AppShell() {
                   to={to}
                   className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1.5 text-xs transition sm:gap-2 sm:px-3 sm:py-2 sm:text-sm ${
                     active
-                      ? 'border-rose-300/50 bg-rose-300/20 text-white'
-                      : 'border-white/10 bg-white/5 text-stone-400 hover:border-white/20 hover:bg-white/10'
+                      ? 'border-pink-300/70 bg-pink-200/50 text-pink-700'
+                      : 'border-sky-200/60 bg-white/50 text-slate-500 hover:border-sky-300/80 hover:bg-white/80'
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />

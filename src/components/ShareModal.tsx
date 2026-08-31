@@ -42,21 +42,21 @@ function MiniRadar({ dimensions }: { dimensions: Dimension[] }) {
       {gridLevels.map((level) => {
         const points = Array.from({ length: count }, (_, i) => getPoint(i, level));
         const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
-        return <path key={level} d={path} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />;
+        return <path key={level} d={path} fill="none" stroke="rgba(56,189,248,0.3)" strokeWidth="1" />;
       })}
       {dimensions.map((_, i) => {
         const p = getPoint(i, 1);
-        return <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />;
+        return <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="rgba(56,189,248,0.2)" strokeWidth="1" />;
       })}
-      <path d={dataPath} fill="rgba(244,114,182,0.25)" stroke="rgba(244,114,182,0.8)" strokeWidth="1.5" />
-      <path d={avgPath} fill="none" stroke="rgba(148,163,184,0.7)" strokeWidth="1" strokeDasharray="3 2" />
+      <path d={dataPath} fill="rgba(244,114,182,0.28)" stroke="rgba(236,72,153,0.85)" strokeWidth="1.5" />
+      <path d={avgPath} fill="none" stroke="rgba(56,189,248,0.8)" strokeWidth="1" strokeDasharray="3 2" />
       {dataPoints.map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="#f472b6" />
+        <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="#ec4899" />
       ))}
       {dimensions.map((d, i) => {
         const lp = getPoint(i, 1.3);
         return (
-          <text key={i} x={lp.x} y={lp.y} textAnchor="middle" dominantBaseline="middle" className="fill-stone-400 text-[8px]">
+          <text key={i} x={lp.x} y={lp.y} textAnchor="middle" dominantBaseline="middle" className="fill-slate-500 text-[8px]">
             {d.label}
           </text>
         );
@@ -74,43 +74,43 @@ export default function ShareModal({ open, onClose, roleName, roleSource, simila
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/40 p-4 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="w-full max-w-sm rounded-[1.5rem] border border-white/10 bg-stone-900 p-5 shadow-2xl sm:p-6"
+        className="w-full max-w-sm rounded-[1.5rem] border border-white/70 bg-white p-5 shadow-2xl sm:p-6"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 头部 */}
         <div className="flex items-center justify-between">
-          <p className="text-sm font-medium text-stone-300">分享图预览</p>
-          <button onClick={onClose} className="rounded-full p-1.5 text-stone-400 transition hover:bg-white/10 hover:text-white">
+          <p className="text-sm font-medium text-slate-600">分享图预览</p>
+          <button onClick={onClose} className="rounded-full p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700">
             <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* 分享图内容区 */}
-        <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-rose-200/10 via-stone-950/30 to-violet-200/10 p-5">
+        <div className="mt-4 overflow-hidden rounded-2xl border border-white/70 bg-gradient-to-br from-sky-200/60 via-white/60 to-pink-200/60 p-5">
           {/* 品牌 + 主结果 */}
-          <p className="text-center text-[10px] uppercase tracking-widest text-stone-500">蓝瞳测评局</p>
-          <h3 className="mt-2 text-center text-lg font-semibold text-white">
+          <p className="text-center text-[10px] uppercase tracking-widest text-slate-400">蓝瞳测评局</p>
+          <h3 className="mt-2 text-center text-lg font-semibold text-slate-800">
             你的另一半像「{roleName}」
           </h3>
-          <p className="mt-0.5 text-center text-xs text-stone-400">{roleSource}</p>
+          <p className="mt-0.5 text-center text-xs text-slate-500">{roleSource}</p>
           <div className="mt-3 flex justify-center">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-200/30 bg-rose-200/10 px-3 py-1">
-              <span className="text-xs font-medium text-rose-100">MATCH {similarity}%</span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-pink-300/50 bg-pink-200/50 px-3 py-1">
+              <span className="text-xs font-medium text-pink-700">MATCH {similarity}%</span>
             </span>
           </div>
 
           {/* 雷达图 */}
           <div className="mt-4 flex flex-col items-center">
             <MiniRadar dimensions={dimensions} />
-            <div className="mt-1.5 flex items-center gap-3 text-[9px] text-stone-500">
+            <div className="mt-1.5 flex items-center gap-3 text-[9px] text-slate-500">
               <span className="inline-flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-rose-300" />
+                <span className="h-1.5 w-1.5 rounded-full bg-pink-400" />
                 测评结果
               </span>
               <span className="inline-flex items-center gap-1">
-                <span className="h-0 w-2.5 border-t border-dashed border-slate-400" />
+                <span className="h-0 w-2.5 border-t border-dashed border-sky-400" />
                 角色均值
               </span>
             </div>
@@ -119,27 +119,27 @@ export default function ShareModal({ open, onClose, roleName, roleSource, simila
           {/* 维度得分简表 */}
           <div className="mt-2 grid grid-cols-3 gap-1.5">
             {dimensions.map((d) => (
-              <div key={d.label} className="rounded-lg bg-white/5 px-2 py-1.5 text-center">
-                <p className="text-[10px] text-stone-400">{d.label}</p>
-                <p className="text-xs font-semibold text-rose-100">{d.value * 10}%</p>
+              <div key={d.label} className="rounded-lg bg-white/70 px-2 py-1.5 text-center">
+                <p className="text-[10px] text-slate-500">{d.label}</p>
+                <p className="text-xs font-semibold text-pink-600">{d.value * 10}%</p>
               </div>
             ))}
           </div>
 
           {/* TA的恋爱观 */}
-          <div className="mt-4 rounded-xl bg-white/5 p-3">
-            <p className="text-[10px] font-medium text-stone-400">TA的恋爱观</p>
-            <p className="mt-1.5 text-xs leading-5 text-stone-300">{loveView}</p>
+          <div className="mt-4 rounded-xl bg-white/70 p-3">
+            <p className="text-[10px] font-medium text-slate-500">TA的恋爱观</p>
+            <p className="mt-1.5 text-xs leading-5 text-slate-600">{loveView}</p>
           </div>
 
           {/* 底部水印 */}
-          <p className="mt-4 text-center text-[9px] text-stone-600">扫码测测你的另一半是谁 · 蓝瞳测评局</p>
+          <p className="mt-4 text-center text-[9px] text-slate-400">扫码测测你的另一半是谁 · 蓝瞳测评局</p>
         </div>
 
         {/* 下载按钮 */}
         <button
           onClick={handleDownload}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-medium text-stone-950 transition hover:bg-rose-100"
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-pink-400 px-5 py-3 text-sm font-medium text-white transition hover:bg-pink-500"
         >
           <Download className="h-4 w-4" />
           下载图片到本地

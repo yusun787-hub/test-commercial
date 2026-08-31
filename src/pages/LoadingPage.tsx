@@ -15,16 +15,16 @@ export default function LoadingPage() {
   }, [location.state, navigate]);
 
   return (
-    <section className="mx-auto flex max-w-3xl flex-col items-center rounded-[2rem] border border-white/10 bg-white/5 px-8 py-20 text-center shadow-2xl shadow-black/30 backdrop-blur-xl">
-      <div className="rounded-full border border-rose-200/30 bg-rose-200/10 p-5 text-rose-100">
+    <section className="mx-auto flex max-w-3xl flex-col items-center rounded-[2rem] border border-white/70 bg-white/55 px-8 py-20 text-center shadow-2xl shadow-sky-200/40 backdrop-blur-xl">
+      <div className="rounded-full border border-pink-300/50 bg-pink-200/50 p-5 text-pink-600">
         <LoaderCircle className="h-10 w-10 animate-spin" />
       </div>
-      <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-stone-300">
+      <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-sky-200/60 bg-white/60 px-4 py-2 text-sm text-slate-500">
         <Sparkles className="h-4 w-4" />
         正在计算你的真实结果
       </div>
-      <h2 className="mt-6 text-3xl font-semibold text-white">正在翻阅你的恋爱剧本…</h2>
-      <p className="mt-4 max-w-xl text-base leading-8 text-stone-300">
+      <h2 className="mt-6 text-3xl font-semibold text-slate-800">正在翻阅你的恋爱剧本…</h2>
+      <p className="mt-4 max-w-xl text-base leading-8 text-slate-600">
         系统会根据 24 道剧情题的选择，匹配最接近的关系原型与电视剧角色结果。
       </p>
     </section>
