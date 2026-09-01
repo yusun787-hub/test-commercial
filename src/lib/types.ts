@@ -16,6 +16,8 @@ export interface RoleSummary {
   tags: string[];
   oneLiner: string;
   riskHint: string;
+  partnerView: string;
+  dramaScene: string;
 }
 
 export interface QuestionOption {
