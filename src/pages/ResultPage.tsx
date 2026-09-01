@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import RadarChart from '../components/RadarChart';
 import ShareModal from '../components/ShareModal';
 import { calculateQuizResult } from '../lib/quiz-config';
+import { getRoleThoughtModules } from '../lib/role-thought-modules';
 
 const ANSWER_STORAGE_KEY = 'tv-character-quiz-answers';
 
@@ -59,6 +60,7 @@ export default function ResultPage() {
   const { role: primaryRole, profile, similarity, answeredCount } = result;
   const archetypeDimensions = profile.dimensions;
   const theme = roleThemes[primaryRole.id] ?? roleThemes['er-kang'];
+  const thoughtModules = getRoleThoughtModules(primaryRole);
 
   return (
     <div className={`-mx-4 -my-4 min-h-screen bg-gradient-to-br ${theme.page} px-4 py-4 transition-colors duration-500 sm:-mx-6 sm:-my-6 sm:px-6 sm:py-6`}>
@@ -111,17 +113,23 @@ export default function ResultPage() {
           <p className="mt-3 text-sm leading-7 text-slate-600">{primaryRole.dramaScene}</p>
         </section>
 
-        {/* 底部两栏 */}
-        <section className="grid gap-4 sm:gap-6 sm:grid-cols-2">
-          <article className={`rounded-[1.5rem] border ${theme.card} p-5 backdrop-blur-xl sm:rounded-[2rem] sm:p-6`}>
-            <p className="text-sm font-medium text-slate-700">他的恋爱观</p>
-            <p className="mt-3 whitespace-pre-line text-sm leading-7 text-slate-600">{primaryRole.partnerView}</p>
-          </article>
+        {/* 恋爱观与心理分析 */}
+        <section className={`rounded-[1.5rem] border ${theme.card} p-5 backdrop-blur-xl sm:rounded-[2rem] sm:p-6`}>
+          <p className="text-sm font-medium text-slate-700">他的恋爱观</p>
+          <p className="mt-3 whitespace-pre-line text-sm leading-7 text-slate-600">{primaryRole.partnerView}</p>
+        </section>
 
-          <article className={`rounded-[1.5rem] border ${theme.card} p-5 backdrop-blur-xl sm:rounded-[2rem] sm:p-6`}>
-            <p className="text-sm font-medium text-slate-700">你的想法</p>
-            <p className="mt-3 text-sm leading-7 text-slate-600">{profile.analysis}</p>
-          </article>
+        <section className={`rounded-[1.5rem] border ${theme.card} p-5 backdrop-blur-xl sm:rounded-[2rem] sm:p-6`}>
+          <p className="text-sm font-medium text-slate-700">你的想法</p>
+          <p className="mt-1 text-xs text-slate-500">结合依恋理论、斯滕伯格爱情三角论、Five Love Languages 与投射效应，拆解你被这个角色打动的深层心理。</p>
+          <div className="mt-5 grid gap-4">
+            {thoughtModules.map((module) => (
+              <article key={module.title} className="rounded-[1.25rem] border border-white/70 bg-white/45 p-4 sm:p-5">
+                <h3 className={`text-base font-semibold ${theme.accentText}`}>{module.title}</h3>
+                <p className="mt-3 text-sm leading-7 text-slate-600">{module.body}</p>
+              </article>
+            ))}
+          </div>
         </section>
 
         {/* 操作按钮 - 放在所有内容最后 */}
