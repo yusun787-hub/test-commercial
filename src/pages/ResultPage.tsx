@@ -71,13 +71,13 @@ export default function ResultPage() {
       {/* 底部两栏 */}
       <section className="grid gap-4 sm:gap-6 sm:grid-cols-2">
         <article className="rounded-[1.5rem] border border-white/70 bg-white/55 p-5 backdrop-blur-xl sm:rounded-[2rem] sm:p-6">
-          <p className="text-sm font-medium text-slate-700">结果解析</p>
-          <p className="mt-3 text-sm leading-7 text-slate-600">{profile.analysis}</p>
+          <p className="text-sm font-medium text-slate-700">他的恋爱观</p>
+          <p className="mt-3 text-sm leading-7 text-slate-600">{profile.partnerView}</p>
         </article>
 
         <article className="rounded-[1.5rem] border border-white/70 bg-white/55 p-5 backdrop-blur-xl sm:rounded-[2rem] sm:p-6">
-          <p className="text-sm font-medium text-slate-700">他的恋爱观</p>
-          <p className="mt-3 text-sm leading-7 text-slate-600">{profile.partnerView}</p>
+          <p className="text-sm font-medium text-slate-700">你的想法</p>
+          <p className="mt-3 text-sm leading-7 text-slate-600">{profile.analysis}</p>
         </article>
       </section>
 
