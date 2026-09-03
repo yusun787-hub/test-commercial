@@ -706,5 +706,5 @@ export function calculateQuizResult(selectedMap: Record<number, string>) {
 
 export const pageMeta = {
   title: '测测TA是电视剧中的谁',
-  subtitle: '24 道剧情题，匹配 22 位经典男性电视剧/影视角色，看看他的关系人格更像谁。',
+  subtitle: '24 道剧情题，耗时约10min，揭晓TA内心的恋爱观和相处秘诀。',
 };
