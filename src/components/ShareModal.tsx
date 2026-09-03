@@ -1,4 +1,5 @@
 import { Download, X } from 'lucide-react';
+import { defaultRoleTheme, roleThemes, type RoleTheme } from '../lib/role-themes';
 
 interface Dimension {
   label: string;
@@ -10,6 +11,7 @@ interface Dimension {
 interface ShareModalProps {
   open: boolean;
   onClose: () => void;
+  roleId: string;
   roleName: string;
   roleSource: string;
   similarity: number;
@@ -18,7 +20,7 @@ interface ShareModalProps {
 }
 
 // 迷你雷达图 - 专用于分享图
-function MiniRadar({ dimensions }: { dimensions: Dimension[] }) {
+function MiniRadar({ dimensions, theme }: { dimensions: Dimension[]; theme: RoleTheme }) {
   const count = dimensions.length;
   const cx = 80;
   const cy = 80;
@@ -48,10 +50,10 @@ function MiniRadar({ dimensions }: { dimensions: Dimension[] }) {
         const p = getPoint(i, 1);
         return <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="rgba(56,189,248,0.2)" strokeWidth="1" />;
       })}
-      <path d={dataPath} fill="rgba(244,114,182,0.28)" stroke="rgba(236,72,153,0.85)" strokeWidth="1.5" />
+      <path d={dataPath} fill={theme.radarFill} stroke={theme.radar} strokeWidth="1.5" />
       <path d={avgPath} fill="none" stroke="rgba(56,189,248,0.8)" strokeWidth="1" strokeDasharray="3 2" />
       {dataPoints.map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="#ec4899" />
+        <circle key={i} cx={p.x} cy={p.y} r="2.5" fill={theme.radar} />
       ))}
       {dimensions.map((d, i) => {
         const lp = getPoint(i, 1.3);
@@ -65,7 +67,9 @@ function MiniRadar({ dimensions }: { dimensions: Dimension[] }) {
   );
 }
 
-export default function ShareModal({ open, onClose, roleName, roleSource, similarity, dimensions, loveView }: ShareModalProps) {
+export default function ShareModal({ open, onClose, roleId, roleName, roleSource, similarity, dimensions, loveView }: ShareModalProps) {
+  const theme = roleThemes[roleId] ?? defaultRoleTheme;
+
   if (!open) return null;
 
   const handleDownload = () => {
@@ -88,7 +92,7 @@ export default function ShareModal({ open, onClose, roleName, roleSource, simila
         </div>
 
         {/* 分享图内容区 */}
-        <div className="mt-4 overflow-hidden rounded-2xl border border-white/70 bg-gradient-to-br from-sky-200/60 via-white/60 to-pink-200/60 p-5">
+        <div className={`mt-4 overflow-hidden rounded-2xl border border-white/70 bg-gradient-to-br ${theme.hero} p-5`}>
           {/* 品牌 + 主结果 */}
           <p className="text-center text-[10px] uppercase tracking-widest text-slate-400">蓝瞳测评局</p>
           <h3 className="mt-2 text-center text-lg font-semibold text-slate-800">
@@ -96,17 +100,17 @@ export default function ShareModal({ open, onClose, roleName, roleSource, simila
           </h3>
           <p className="mt-0.5 text-center text-xs text-slate-500">{roleSource}</p>
           <div className="mt-3 flex justify-center">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-pink-300/50 bg-pink-200/50 px-3 py-1">
-              <span className="text-xs font-medium text-pink-700">MATCH {similarity}%</span>
+            <span className={`inline-flex items-center gap-1.5 rounded-full border border-white/70 px-3 py-1 ${theme.tag}`}>
+              <span className={`text-xs font-medium ${theme.accentText}`}>MATCH {similarity}%</span>
             </span>
           </div>
 
           {/* 雷达图 */}
           <div className="mt-4 flex flex-col items-center">
-            <MiniRadar dimensions={dimensions} />
+            <MiniRadar dimensions={dimensions} theme={theme} />
             <div className="mt-1.5 flex items-center gap-3 text-[9px] text-slate-500">
               <span className="inline-flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-pink-400" />
+                <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: theme.radar }} />
                 测评结果
               </span>
               <span className="inline-flex items-center gap-1">
@@ -121,7 +125,7 @@ export default function ShareModal({ open, onClose, roleName, roleSource, simila
             {dimensions.map((d) => (
               <div key={d.label} className="rounded-lg bg-white/70 px-2 py-1.5 text-center">
                 <p className="text-[10px] text-slate-500">{d.label}</p>
-                <p className="text-xs font-semibold text-pink-600">{d.value * 10}%</p>
+                <p className={`text-xs font-semibold ${theme.accentText}`}>{d.value * 10}%</p>
               </div>
             ))}
           </div>
@@ -139,7 +143,7 @@ export default function ShareModal({ open, onClose, roleName, roleSource, simila
         {/* 下载按钮 */}
         <button
           onClick={handleDownload}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-pink-400 px-5 py-3 text-sm font-medium text-white transition hover:bg-pink-500"
+          className={`mt-4 flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium text-white transition ${theme.accent}`}
         >
           <Download className="h-4 w-4" />
           下载图片到本地

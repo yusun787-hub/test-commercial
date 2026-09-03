@@ -4,45 +4,12 @@ import { Link, useLocation } from 'react-router-dom';
 import RadarChart from '../components/RadarChart';
 import ShareModal from '../components/ShareModal';
 import { calculateQuizResult } from '../lib/quiz-config';
+import { getRoleAdviceModules } from '../lib/role-advice-modules';
 import { getRoleThoughtModules } from '../lib/role-thought-modules';
 import { getRoleLoveViewModules } from '../lib/role-love-view-modules';
+import { defaultRoleTheme, roleThemes } from '../lib/role-themes';
 
 const ANSWER_STORAGE_KEY = 'tv-character-quiz-answers';
-
-type RoleTheme = {
-  page: string;
-  hero: string;
-  card: string;
-  accent: string;
-  accentText: string;
-  tag: string;
-  shadow: string;
-};
-
-const roleThemes: Record<string, RoleTheme> = {
-  'mei-changsu': { page: 'from-slate-200 via-stone-100 to-blue-100', hero: 'from-slate-300/70 via-white/60 to-blue-200/60', card: 'bg-white/60 border-slate-200/80', accent: 'bg-slate-700 hover:bg-slate-800', accentText: 'text-slate-700', tag: 'bg-slate-100/80 text-slate-700', shadow: 'shadow-slate-300/50' },
-  'guo-junwang': { page: 'from-emerald-100 via-white to-rose-100', hero: 'from-emerald-200/60 via-white/70 to-rose-200/60', card: 'bg-white/60 border-emerald-100/80', accent: 'bg-emerald-500 hover:bg-emerald-600', accentText: 'text-emerald-700', tag: 'bg-emerald-50/90 text-emerald-700', shadow: 'shadow-emerald-200/50' },
-  'wen-shichu': { page: 'from-teal-100 via-white to-amber-100', hero: 'from-teal-200/60 via-white/70 to-amber-200/60', card: 'bg-white/60 border-teal-100/80', accent: 'bg-teal-500 hover:bg-teal-600', accentText: 'text-teal-700', tag: 'bg-teal-50/90 text-teal-700', shadow: 'shadow-teal-200/50' },
-  'jiang-defu': { page: 'from-orange-100 via-white to-sky-100', hero: 'from-orange-200/60 via-white/70 to-sky-200/60', card: 'bg-white/60 border-orange-100/80', accent: 'bg-orange-500 hover:bg-orange-600', accentText: 'text-orange-700', tag: 'bg-orange-50/90 text-orange-700', shadow: 'shadow-orange-200/50' },
-  'feng-teng': { page: 'from-zinc-200 via-white to-red-100', hero: 'from-zinc-300/70 via-white/70 to-red-200/60', card: 'bg-white/60 border-zinc-200/80', accent: 'bg-zinc-800 hover:bg-zinc-900', accentText: 'text-zinc-800', tag: 'bg-zinc-100/90 text-zinc-800', shadow: 'shadow-zinc-300/50' },
-  'chen-yu': { page: 'from-cyan-100 via-slate-50 to-gray-200', hero: 'from-cyan-200/50 via-white/70 to-gray-200/60', card: 'bg-white/60 border-cyan-100/80', accent: 'bg-cyan-600 hover:bg-cyan-700', accentText: 'text-cyan-700', tag: 'bg-cyan-50/90 text-cyan-700', shadow: 'shadow-cyan-200/50' },
-  yongzheng: { page: 'from-yellow-100 via-stone-100 to-purple-100', hero: 'from-yellow-200/60 via-white/70 to-purple-200/60', card: 'bg-white/60 border-yellow-100/80', accent: 'bg-yellow-700 hover:bg-yellow-800', accentText: 'text-yellow-800', tag: 'bg-yellow-50/90 text-yellow-800', shadow: 'shadow-yellow-200/50' },
-  'xiao-feng': { page: 'from-amber-100 via-orange-50 to-stone-200', hero: 'from-amber-200/70 via-white/70 to-stone-300/60', card: 'bg-white/60 border-amber-100/80', accent: 'bg-amber-700 hover:bg-amber-800', accentText: 'text-amber-800', tag: 'bg-amber-50/90 text-amber-800', shadow: 'shadow-amber-200/50' },
-  'li-chengyin': { page: 'from-red-100 via-rose-50 to-amber-100', hero: 'from-red-200/60 via-white/70 to-amber-200/60', card: 'bg-white/60 border-red-100/80', accent: 'bg-red-600 hover:bg-red-700', accentText: 'text-red-700', tag: 'bg-red-50/90 text-red-700', shadow: 'shadow-red-200/50' },
-  'gu-tingye': { page: 'from-lime-100 via-white to-stone-200', hero: 'from-lime-200/60 via-white/70 to-stone-300/60', card: 'bg-white/60 border-lime-100/80', accent: 'bg-lime-700 hover:bg-lime-800', accentText: 'text-lime-800', tag: 'bg-lime-50/90 text-lime-800', shadow: 'shadow-lime-200/50' },
-  'qi-heng': { page: 'from-blue-100 via-white to-violet-100', hero: 'from-blue-200/60 via-white/70 to-violet-200/60', card: 'bg-white/60 border-blue-100/80', accent: 'bg-blue-500 hover:bg-blue-600', accentText: 'text-blue-700', tag: 'bg-blue-50/90 text-blue-700', shadow: 'shadow-blue-200/50' },
-  'he-hongwen': { page: 'from-green-100 via-white to-teal-100', hero: 'from-green-200/60 via-white/70 to-teal-200/60', card: 'bg-white/60 border-green-100/80', accent: 'bg-green-500 hover:bg-green-600', accentText: 'text-green-700', tag: 'bg-green-50/90 text-green-700', shadow: 'shadow-green-200/50' },
-  'sheng-zhangbai': { page: 'from-stone-100 via-white to-indigo-100', hero: 'from-stone-200/60 via-white/70 to-indigo-200/60', card: 'bg-white/60 border-stone-200/80', accent: 'bg-indigo-700 hover:bg-indigo-800', accentText: 'text-indigo-700', tag: 'bg-indigo-50/90 text-indigo-700', shadow: 'shadow-indigo-200/50' },
-  'liang-han': { page: 'from-fuchsia-100 via-white to-rose-100', hero: 'from-fuchsia-200/60 via-white/70 to-rose-200/60', card: 'bg-white/60 border-fuchsia-100/80', accent: 'bg-fuchsia-500 hover:bg-fuchsia-600', accentText: 'text-fuchsia-700', tag: 'bg-fuchsia-50/90 text-fuchsia-700', shadow: 'shadow-fuchsia-200/50' },
-  'dongfang-qingcang': { page: 'from-purple-200 via-slate-100 to-indigo-200', hero: 'from-purple-300/70 via-white/60 to-indigo-300/70', card: 'bg-white/60 border-purple-100/80', accent: 'bg-purple-700 hover:bg-purple-800', accentText: 'text-purple-800', tag: 'bg-purple-50/90 text-purple-800', shadow: 'shadow-purple-300/50' },
-  'fan-xian': { page: 'from-emerald-100 via-white to-cyan-100', hero: 'from-emerald-200/60 via-white/70 to-cyan-200/60', card: 'bg-white/60 border-emerald-100/80', accent: 'bg-emerald-600 hover:bg-emerald-700', accentText: 'text-emerald-700', tag: 'bg-emerald-50/90 text-emerald-700', shadow: 'shadow-emerald-200/50' },
-  'wang-kuan': { page: 'from-sky-100 via-white to-blue-100', hero: 'from-sky-200/60 via-white/70 to-blue-200/60', card: 'bg-white/60 border-sky-100/80', accent: 'bg-sky-600 hover:bg-sky-700', accentText: 'text-sky-700', tag: 'bg-sky-50/90 text-sky-700', shadow: 'shadow-sky-200/50' },
-  yongqi: { page: 'from-rose-100 via-white to-orange-100', hero: 'from-rose-200/60 via-white/70 to-orange-200/60', card: 'bg-white/60 border-rose-100/80', accent: 'bg-rose-500 hover:bg-rose-600', accentText: 'text-rose-700', tag: 'bg-rose-50/90 text-rose-700', shadow: 'shadow-rose-200/50' },
-  'er-kang': { page: 'from-pink-100 via-white to-red-100', hero: 'from-pink-200/60 via-white/70 to-red-200/60', card: 'bg-white/60 border-pink-100/80', accent: 'bg-pink-500 hover:bg-pink-600', accentText: 'text-pink-700', tag: 'bg-pink-50/90 text-pink-700', shadow: 'shadow-pink-200/50' },
-  'li-daren': { page: 'from-sky-100 via-white to-amber-100', hero: 'from-sky-200/60 via-white/70 to-amber-200/60', card: 'bg-white/60 border-sky-100/80', accent: 'bg-sky-500 hover:bg-sky-600', accentText: 'text-sky-700', tag: 'bg-sky-50/90 text-sky-700', shadow: 'shadow-sky-200/50' },
-  'xie-zhiyao': { page: 'from-emerald-100 via-white to-yellow-100', hero: 'from-emerald-200/60 via-white/70 to-yellow-200/60', card: 'bg-white/60 border-emerald-100/80', accent: 'bg-emerald-500 hover:bg-emerald-600', accentText: 'text-emerald-700', tag: 'bg-emerald-50/90 text-emerald-700', shadow: 'shadow-emerald-200/50' },
-  'meng-dan': { page: 'from-rose-100 via-white to-purple-100', hero: 'from-rose-200/60 via-white/70 to-purple-200/60', card: 'bg-white/60 border-rose-100/80', accent: 'bg-rose-600 hover:bg-rose-700', accentText: 'text-rose-700', tag: 'bg-rose-50/90 text-rose-700', shadow: 'shadow-rose-200/50' },
-};
 
 function getStoredAnswers() {
   try {
@@ -60,9 +27,10 @@ export default function ResultPage() {
   const result = useMemo(() => calculateQuizResult(selectedMap), [selectedMap]);
   const { role: primaryRole, profile, similarity, answeredCount } = result;
   const archetypeDimensions = profile.dimensions;
-  const theme = roleThemes[primaryRole.id] ?? roleThemes['er-kang'];
+  const theme = roleThemes[primaryRole.id] ?? defaultRoleTheme;
   const thoughtModules = getRoleThoughtModules(primaryRole);
   const loveViewModules = getRoleLoveViewModules(primaryRole);
+  const adviceModules = getRoleAdviceModules(primaryRole);
 
   return (
     <div className={`-mx-4 -my-4 min-h-screen bg-gradient-to-br ${theme.page} px-4 py-4 transition-colors duration-500 sm:-mx-6 sm:-my-6 sm:px-6 sm:py-6`}>
@@ -109,10 +77,10 @@ export default function ResultPage() {
           </div>
         </section>
 
-        {/* 剧情演绎 */}
+        {/* 角色金句 */}
         <section className={`rounded-[1.5rem] border ${theme.card} p-5 backdrop-blur-xl sm:rounded-[2rem] sm:p-6`}>
-          <p className="text-sm font-medium text-slate-700">剧情演绎</p>
-          <p className="mt-3 text-sm leading-7 text-slate-600">{primaryRole.dramaScene}</p>
+          <p className="text-sm font-medium text-slate-700">角色金句</p>
+          <p className="mt-3 text-sm leading-7 text-slate-600">{primaryRole.iconicQuote}</p>
         </section>
 
         {/* 恋爱观与心理分析 */}
@@ -134,6 +102,20 @@ export default function ResultPage() {
           <p className="mt-1 text-xs text-slate-500">结合依恋理论、斯滕伯格爱情三角论、Five Love Languages 与投射效应，拆解你被这个角色打动的深层心理。</p>
           <div className="mt-5 grid gap-4">
             {thoughtModules.map((module) => (
+              <article key={module.title} className="rounded-[1.25rem] border border-white/70 bg-white/45 p-4 sm:p-5">
+                <h3 className={`text-base font-semibold ${theme.accentText}`}>{module.title}</h3>
+                <p className="mt-3 text-sm leading-7 text-slate-600">{module.body}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* 相处建议 */}
+        <section className={`rounded-[1.5rem] border ${theme.card} p-5 backdrop-blur-xl sm:rounded-[2rem] sm:p-6`}>
+          <p className="text-sm font-medium text-slate-700">相处建议</p>
+          <p className="mt-1 text-xs text-slate-500">结合心理学分析，以及他的恋爱观与你的偏好，给出 5 条有温度的相处思路。</p>
+          <div className="mt-5 grid gap-4">
+            {adviceModules.map((module) => (
               <article key={module.title} className="rounded-[1.25rem] border border-white/70 bg-white/45 p-4 sm:p-5">
                 <h3 className={`text-base font-semibold ${theme.accentText}`}>{module.title}</h3>
                 <p className="mt-3 text-sm leading-7 text-slate-600">{module.body}</p>
@@ -164,6 +146,7 @@ export default function ResultPage() {
         <ShareModal
           open={showShareModal}
           onClose={() => setShowShareModal(false)}
+          roleId={primaryRole.id}
           roleName={primaryRole.name}
           roleSource={primaryRole.source}
           similarity={similarity}

@@ -28,9 +28,11 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
   const avgPoints = dimensions.map((d, i) => getPoint(i, d.roleAvg / 10));
   const avgPath = avgPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
 
-  // 找出最高分维度，作为本次测评的最优势维度
+  // 找出最高分和最低分维度，分别标注本次测评的优势与劣势
   const maxIndex = dimensions.reduce((maxI, d, i, arr) => (d.value > arr[maxI].value ? i : maxI), 0);
+  const minIndex = dimensions.reduce((minI, d, i, arr) => (d.value < arr[minI].value ? i : minI), 0);
   const maxPoint = dataPoints[maxIndex];
+  const minPoint = dataPoints[minIndex];
 
   return (
     <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-6">
@@ -61,9 +63,12 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
             <circle key={i} cx={p.x} cy={p.y} r={i === maxIndex ? '6' : '4'} fill={i === maxIndex ? '#ec4899' : '#f472b6'} />
           ))}
 
-          {/* 最优势维度标注（保留高亮圈，去掉文字标签） */}
+          {/* 最优势与最劣势维度标注 */}
           <g>
             <circle cx={maxPoint.x} cy={maxPoint.y} r="11" fill="none" stroke="#ec4899" strokeWidth="2" opacity="0.75" />
+            {minIndex !== maxIndex && (
+              <circle cx={minPoint.x} cy={minPoint.y} r="11" fill="none" stroke="#94a3b8" strokeWidth="2" opacity="0.75" />
+            )}
           </g>
 
           {/* 标签 */}
@@ -100,7 +105,16 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
       {/* 维度解读 */}
       <div className="flex-1 space-y-2.5">
         {dimensions.map((d, i) => (
-          <div key={d.label} className={`rounded-xl p-3 ${i === maxIndex ? 'border border-pink-300/50 bg-pink-100/60' : 'bg-white/60'}`}>
+          <div
+            key={d.label}
+            className={`rounded-xl p-3 ${
+              i === maxIndex
+                ? 'border border-pink-300/50 bg-pink-100/60'
+                : i === minIndex
+                  ? 'border border-slate-200/50 bg-slate-100/60'
+                  : 'bg-white/60'
+            }`}
+          >
             <div className="flex items-center justify-between gap-2">
               <span className="text-sm font-medium text-slate-700">{d.label}</span>
               <span className={`text-xs font-medium ${i === maxIndex ? 'text-pink-600' : 'text-sky-600'}`}>
@@ -108,9 +122,11 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
               </span>
             </div>
             <p className="mt-1 text-xs leading-5 text-slate-500">{d.description}</p>
-            {i === maxIndex && (
+            {i === maxIndex ? (
               <p className="mt-1 text-xs font-medium text-pink-600">🌟 这是他最突出的优势项</p>
-            )}
+            ) : i === minIndex ? (
+              <p className="mt-1 text-xs font-medium text-slate-500">📉 这是他相对较弱的维度</p>
+            ) : null}
           </div>
         ))}
       </div>

@@ -17,7 +17,7 @@ export interface RoleSummary {
   oneLiner: string;
   riskHint: string;
   partnerView: string;
-  dramaScene: string;
+  iconicQuote: string;
 }
 
 export interface QuestionOption {
