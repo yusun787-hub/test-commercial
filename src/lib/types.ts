@@ -18,6 +18,7 @@ export interface RoleSummary {
   riskHint: string;
   partnerView: string;
   iconicQuote: string;
+  dimensionOverrides?: { label: string; value: number; roleAvg: number; description: string }[];
 }
 
 export interface QuestionOption {

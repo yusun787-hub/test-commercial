@@ -26,7 +26,74 @@ function buildAnswerSeed(selectedMap: Record<number, string>) {
     .join('|');
 }
 
-export const roleHighlights: RoleSummary[] = [
+const dimensionDefinitions: Record<Archetype, { label: string; description: string }[]> = {
+  稳定照顾型: [
+    { label: '情绪价值', description: '能接住情绪，也愿意给出具体安抚。' },
+    { label: '责任感', description: '对承诺和生活安排有持续行动。' },
+    { label: '边界感', description: '关系边界清楚，会主动降低误会。' },
+    { label: '稳定性', description: '情绪和关系节奏都比较稳定。' },
+    { label: '浪漫感', description: '浪漫不夸张，但细节里有温度。' },
+    { label: '现实感', description: '能兼顾感受与现实安排。' },
+  ],
+  能扛事推进型: [
+    { label: '情绪价值', description: '会关心你，但常常用方案代替安慰。' },
+    { label: '责任感', description: '关键问题上有承担，不容易把你丢下。' },
+    { label: '边界感', description: '原则感较强，但表达方式可能偏硬。' },
+    { label: '稳定性', description: '遇到外部压力时更愿意处理而不是逃避。' },
+    { label: '浪漫感', description: '仪式感不是强项，更偏实际付出。' },
+    { label: '现实感', description: '目标、资源和后果都会纳入判断。' },
+  ],
+  温柔守护型: [
+    { label: '情绪价值', description: '安慰方式温和，不会轻易否定你的感受。' },
+    { label: '责任感', description: '愿意长期投入，也珍惜承诺。' },
+    { label: '边界感', description: '对亲密关系有明确忠诚感。' },
+    { label: '稳定性', description: '关系节奏稳定，但有时表达偏慢。' },
+    { label: '浪漫感', description: '浪漫更像暗线，藏在细节和记忆里。' },
+    { label: '现实感', description: '现实安排会考虑，但不完全压过感情。' },
+  ],
+  温柔但没结果型: [
+    { label: '情绪价值', description: '会提供温柔回应，但稳定性不足。' },
+    { label: '责任感', description: '遇到承诺和现实推进时容易迟疑。' },
+    { label: '边界感', description: '关系边界有时暧昧，不够清晰。' },
+    { label: '稳定性', description: '热度和行动容易随环境变化。' },
+    { label: '浪漫感', description: '很会制造让人心动的瞬间。' },
+    { label: '现实感', description: '对长期问题的处理偏弱。' },
+  ],
+  体面逃避型: [
+    { label: '情绪价值', description: '不太会主动提供情绪支持，多用道理回应你的感受。' },
+    { label: '责任感', description: '事业上有担当，但在关系细节中容易掉线。' },
+    { label: '边界感', description: '与外界关系暧昧，给人不够明确的距离信号。' },
+    { label: '稳定性', description: '情绪整体平稳，但压力大时可能选择回避。' },
+    { label: '浪漫感', description: '偶尔会制造仪式感，但持续性一般。' },
+    { label: '现实感', description: '对生活规划清晰，做事讲效率和体面。' },
+  ],
+  强势控制型: [
+    { label: '情绪价值', description: '不太习惯承接情绪，更容易给判断。' },
+    { label: '责任感', description: '会承担，但常带着强主导。' },
+    { label: '边界感', description: '容易以爱之名越过你的边界。' },
+    { label: '稳定性', description: '情绪强度高，稳定性取决于掌控感。' },
+    { label: '浪漫感', description: '上头感很强，戏剧张力高。' },
+    { label: '现实感', description: '判断现实，但也容易把你纳入他的计划。' },
+  ],
+  现实算计型: [
+    { label: '情绪价值', description: '会照顾感受，但不会让感受压过判断。' },
+    { label: '责任感', description: '承担建立在成本可控和目标明确之上。' },
+    { label: '边界感', description: '边界感较强，但也会服务于现实目标。' },
+    { label: '稳定性', description: '外部稳定性不错，内在温度需要确认。' },
+    { label: '浪漫感', description: '浪漫会有，但常被现实安排包裹。' },
+    { label: '现实感', description: '擅长权衡局势、资源和未来收益。' },
+  ],
+};
+
+function roleDimensions(archetype: Archetype, scores: [value: number, roleAvg: number][]) {
+  return dimensionDefinitions[archetype].map((dimension, index) => ({
+    ...dimension,
+    value: scores[index][0],
+    roleAvg: scores[index][1],
+  }));
+}
+
+const baseRoleHighlights: Omit<RoleSummary, 'dimensionOverrides'>[] = [
   // 经典男主/影视角色
   {
     id: 'mei-changsu',
@@ -294,7 +361,115 @@ export const roleHighlights: RoleSummary[] = [
     partnerView: '1. 他的恋爱观热烈、诗意，爱起来像要冲破一切。\n2. 他很会制造命运感，让人短时间内迅速上头。\n3. 但他对现实阻力的处理能力不足，容易让浪漫停在奔赴里。\n4. 比如他可以隔着重重阻碍来见你，却未必能给出稳定生活的完整方案。\n5. 和他相处会很像戏，但你要问自己：谢幕后谁来负责明天。',
     iconicQuote: '《还珠格格》中，蒙丹翻越重重宫墙只为见含香一面，把爱情喊成不顾一切的奔赴：「含香，没有你，我活着还有什么意义！」',
   },
+  {
+    id: 'lu-licheng',
+    name: '陆励成',
+    source: '《最美的时光》',
+    archetype: '温柔但没结果型',
+    title: '把成全藏在沉默里的守候者',
+    tags: ['深情', '克制', '遗憾'],
+    oneLiner: '他能看懂你的逞强，也肯一路护着你，却未必等得到你回头。',
+    riskHint: '再长久的守候，也不能替代双向选择。',
+    partnerView: '1. 他的喜欢坚定而克制，常在你看不见的地方替你兜底。\n2. 他懂得你的野心和脆弱，却不愿用付出逼你回应。\n3. 他习惯把爱留在行动里，因此很容易错过确认关系的时机。\n4. 比如你为另一个人难过时，他会送你回家、替你处理麻烦，却把自己的失落藏好。\n5. 和他相处要看见深情，也要及时确认彼此是否走向同一个未来。',
+    iconicQuote: '《最美的时光》中，陆励成在雨夜陪苏蔓走过失恋低谷，明知她心有所属仍把关心留在身边：「只要你回头，我一直都在。」',
+  },
+  {
+    id: 'he-shuhuan',
+    name: '何书桓',
+    source: '《情深深雨濛濛》',
+    archetype: '体面逃避型',
+    title: '深情表态与摇摆选择并存的体面派',
+    tags: ['浪漫', '心软', '摇摆'],
+    oneLiner: '他每次动情都像唯一一次，可到了选择面前又容易被下一份愧疚拉走。',
+    riskHint: '会解释不等于会负责，体面也遮不住反复摇摆。',
+    partnerView: '1. 他的恋爱观重感觉，也很在意自己是否显得正直深情。\n2. 他擅长表达与安慰，却容易在多方情绪之间犹豫。\n3. 冲突来临时，他常用解释维持体面，真正的边界却不够坚定。\n4. 比如面对依萍和如萍的感情，他总想不伤害任何人，最后却让每个人都受伤。\n5. 和他相处要少听当下表态，多看他能否为选择承担后果。',
+    iconicQuote: '《情深深雨濛濛》中，何书桓在依萍跳桥后仓皇寻找她，情绪激烈地质问自己与所有人：「我不是天下唯一一个为两个女人动心的男人吧？」',
+  },
+  {
+    id: 'ying-qin',
+    name: '应勤',
+    source: '《欢乐颂》',
+    archetype: '体面逃避型',
+    title: '守规矩却把偏见藏进条件里的现实恋人',
+    tags: ['老实', '保守', '回避冲突'],
+    oneLiner: '他看起来适合过日子，却可能在真正的考验里先维护自己的标准。',
+    riskHint: '温和外表下的僵硬标准，会把爱变成资格审查。',
+    partnerView: '1. 他的恋爱观追求传统、稳定和可交代，喜欢一切符合预设。\n2. 他平日体贴务实，但遇到价值冲突容易迅速退回自己的规则。\n3. 他害怕承受舆论与家庭压力，因此会把逃避包装成理性选择。\n4. 比如得知邱莹莹的过去后，他没有先理解她，而是用道德标准切断关系。\n5. 和他相处要尽早核对价值观，也要观察他能否在压力下保持尊重。',
+    iconicQuote: '《欢乐颂》中，应勤得知邱莹莹的感情经历后，以传统标准否定两人的关系：「我接受不了，我要找的是能结婚过日子的女孩。」',
+  },
+  {
+    id: 'daoming-si',
+    name: '道明寺',
+    source: '《流星花园》',
+    archetype: '强势控制型',
+    title: '把热烈偏爱写成命令句的霸道少爷',
+    tags: ['霸道', '执着', '占有欲'],
+    oneLiner: '他认定你就会不顾一切追上来，也很容易把你的拒绝当成尚未被说服。',
+    riskHint: '强烈追求若不尊重拒绝，浪漫就会越过边界。',
+    partnerView: '1. 他的恋爱观直接炽烈，喜欢就要立刻拥有明确答案。\n2. 他会投入全部注意力，也习惯用力量和资源主导关系。\n3. 他的保护欲很强，但不成熟时会把占有误认成专一。\n4. 比如杉菜拒绝时，他仍用命令式追求逼近，直到慢慢学会尊重她的选择。\n5. 和他相处可以接住真心，却必须让“不同意”也拥有完整效力。',
+    iconicQuote: '《流星花园》中，道明寺在天台拦住杉菜，用一贯霸道的方式宣布自己的心意：「不管你怎么逃，你注定是我的女人。」',
+  },
+  {
+    id: 'xie-wei',
+    name: '谢危',
+    source: '《宁安如梦》',
+    archetype: '现实算计型',
+    title: '把心动也纳入棋局的冷峻谋士',
+    tags: ['谋略', '克制', '危险感'],
+    oneLiner: '他会替你算尽退路，也会让你分不清这一步是深情还是布局。',
+    riskHint: '保护与利用只隔一层信息差，别放弃自己的判断。',
+    partnerView: '1. 他的恋爱观深藏在权谋与戒备之下，越在乎越要掌握局面。\n2. 他能精准看见你的处境，并用最有效的方式替你排除风险。\n3. 他不轻易交付信任，也可能把隐瞒视作必要的保护。\n4. 比如危局里他先算清所有人的动机，再把姜雪宁放进最安全却也最受控的位置。\n5. 和他相处要珍惜他的破局能力，也要坚持重大选择共同知情。',
+    iconicQuote: '《宁安如梦》中，谢危在危局中一次次护住姜雪宁，终于不再掩饰偏执与软肋：「宁二，我这一生，唯独拿你没有办法。」',
+  },
+  {
+    id: 'ling-buyi',
+    name: '凌不疑',
+    source: '《星汉灿烂·月升沧海》',
+    archetype: '现实算计型',
+    title: '让爱情与复仇并行的冷静执行者',
+    tags: ['果决', '隐忍', '目标至上'],
+    oneLiner: '他可以把你护进未来，却也可能为了最终目标独自改写两个人的命运。',
+    riskHint: '替你承担一切的背面，可能是剥夺你的知情与选择。',
+    partnerView: '1. 他的恋爱观坚定而沉重，爱与多年目标始终并行。\n2. 他执行力极强，认定你后会把婚姻、家族和安全都安排妥当。\n3. 但他习惯独自背负真相，在终局前很难真正共享风险。\n4. 比如复仇前他替程少商铺好退路，却没有让她参与最重要的决定。\n5. 和他相处会被强大行动保护，也要确认你不是被排除在真相之外。',
+    iconicQuote: '《星汉灿烂·月升沧海》中，凌不疑在城楼复仇前把程少商推离险境，以决绝保护切断共同选择：「少商，往后没有我，你也要好好活着。」',
+  },
 ];
+
+const roleDimensionScores: Record<string, [value: number, roleAvg: number][]> = {
+  'mei-changsu': [[5.7, 5.3], [8.8, 8.4], [7.6, 7.2], [8.2, 7.9], [4.9, 5.1], [9.6, 9.2]],
+  'guo-junwang': [[9.1, 8.6], [7.7, 7.4], [8.8, 8.3], [7.4, 7.1], [9.3, 8.8], [5.2, 5.6]],
+  'wen-shichu': [[8.3, 7.8], [4.7, 4.3], [5.8, 5.4], [5.1, 4.8], [6.9, 7.2], [5.6, 5.1]],
+  'jiang-defu': [[7.6, 7.3], [9.4, 8.9], [8.1, 7.8], [9.3, 8.8], [5.4, 5.8], [8.7, 8.2]],
+  'feng-teng': [[4.6, 4.1], [8.2, 7.7], [2.8, 3.2], [6.7, 6.2], [8.6, 8.1], [8.9, 8.4]],
+  'chen-yu': [[3.4, 4.2], [6.8, 6.3], [5.2, 4.7], [5.9, 5.5], [2.7, 3.4], [7.9, 7.3]],
+  yongzheng: [[2.6, 3.1], [8.4, 7.8], [2.1, 2.7], [5.8, 5.3], [7.2, 7.7], [9.1, 8.6]],
+  'xiao-feng': [[6.8, 6.3], [9.7, 9.2], [8.4, 7.9], [8.9, 8.4], [5.2, 5.7], [7.7, 8.1]],
+  'li-chengyin': [[3.9, 4.6], [7.8, 7.3], [2.7, 3.4], [4.8, 5.2], [9.2, 8.7], [9.4, 8.9]],
+  'gu-tingye': [[6.1, 6.6], [9.5, 9.1], [7.8, 7.3], [8.7, 8.2], [5.9, 5.4], [9.2, 8.8]],
+  'qi-heng': [[8.6, 8.1], [4.2, 4.8], [6.3, 5.9], [4.6, 5.1], [8.9, 8.4], [4.3, 4.7]],
+  'he-hongwen': [[8.7, 8.2], [7.2, 7.6], [7.3, 7.8], [7.9, 7.5], [6.4, 6.8], [7.1, 6.6]],
+  'sheng-zhangbai': [[6.4, 6.9], [9.2, 8.7], [9.4, 8.9], [9.6, 9.1], [4.3, 4.8], [9.1, 8.6]],
+  'liang-han': [[6.2, 5.7], [3.8, 4.5], [2.9, 3.6], [4.4, 4.9], [8.3, 7.8], [6.1, 6.7]],
+  'dongfang-qingcang': [[5.3, 4.8], [9.1, 8.6], [1.9, 2.4], [6.2, 5.7], [9.6, 9.1], [7.4, 7.9]],
+  'fan-xian': [[7.9, 7.4], [8.8, 8.3], [8.6, 8.1], [7.7, 8.2], [7.3, 6.8], [9.4, 8.9]],
+  'wang-kuan': [[8.4, 7.9], [8.9, 8.4], [9.2, 8.7], [9.1, 8.6], [6.8, 7.3], [7.4, 6.9]],
+  yongqi: [[7.3, 6.8], [8.7, 8.2], [6.9, 7.4], [7.2, 7.7], [8.5, 8.1], [6.3, 6.7]],
+  'er-kang': [[9.3, 8.8], [8.6, 8.1], [6.7, 7.2], [8.4, 7.9], [8.8, 8.3], [5.7, 6.2]],
+  'li-daren': [[9.2, 8.7], [8.5, 8.1], [8.8, 8.3], [9.4, 8.9], [6.7, 6.2], [7.3, 7.8]],
+  'xie-zhiyao': [[8.8, 8.3], [8.9, 8.4], [8.7, 8.2], [9.1, 8.6], [7.4, 6.9], [8.6, 8.1]],
+  'meng-dan': [[7.8, 7.3], [3.1, 3.7], [3.9, 4.4], [2.8, 3.4], [9.7, 9.2], [2.6, 3.2]],
+  'lu-licheng': [[8.9, 8.4], [6.2, 5.7], [7.1, 6.6], [6.4, 5.9], [7.6, 8.1], [7.2, 6.7]],
+  'he-shuhuan': [[7.4, 6.9], [4.6, 5.1], [2.4, 3.1], [3.7, 4.3], [9.1, 8.6], [5.3, 5.8]],
+  'ying-qin': [[3.8, 4.4], [5.7, 6.2], [4.8, 4.3], [6.3, 5.8], [4.1, 4.7], [8.6, 8.1]],
+  'daoming-si': [[4.7, 4.2], [7.6, 8.1], [1.7, 2.2], [4.9, 5.4], [9.4, 8.9], [5.8, 6.3]],
+  'xie-wei': [[5.1, 4.6], [8.9, 8.4], [5.3, 5.8], [8.1, 7.6], [6.8, 6.3], [9.8, 9.3]],
+  'ling-buyi': [[4.4, 4.9], [9.3, 8.8], [6.7, 6.2], [7.6, 8.1], [5.9, 5.4], [9.6, 9.1]],
+};
+
+export const roleHighlights: RoleSummary[] = baseRoleHighlights.map((role) => ({
+  ...role,
+  dimensionOverrides: roleDimensions(role.archetype, roleDimensionScores[role.id]),
+}));
 
 export const archetypeProfiles: Record<Archetype, {
   loveView: string;
@@ -684,7 +859,7 @@ export function calculateQuizResult(selectedMap: Record<number, string>) {
   });
 
   const sortedArchetypes = Object.entries(scores).sort((a, b) => b[1] - a[1]) as [Archetype, number][];
-  const [topArchetype, topScore] = sortedArchetypes[0];
+  const [topArchetype] = sortedArchetypes[0];
 
   // 同一原型下支持多个角色：用“答题组合”做稳定分流，让结果更丰富
   const candidates = roleHighlights.filter((item) => item.archetype === topArchetype);
@@ -693,7 +868,13 @@ export function calculateQuizResult(selectedMap: Record<number, string>) {
   const role = (candidates.length ? candidates[index] : roleHighlights[0]) ?? roleHighlights[0];
 
   const answeredCount = Object.keys(selectedMap).length;
-  const similarity = Math.min(96, Math.max(68, Math.round((topScore / Math.max(answeredCount, 1)) * 100)));
+  const [topScore, secondScore] = sortedArchetypes.slice(0, 2).map(([, score]) => score);
+  const gap = topScore - secondScore;
+  const baseRatio = topScore / Math.max(answeredCount, 1);
+  const amplified = baseRatio * 2.8;
+  const bonus = gap * 1.5;
+  const jitter = (stableHash(buildAnswerSeed(selectedMap)) % 7) - 3;
+  const similarity = Math.min(96, Math.max(72, Math.round(amplified * 100 + bonus + jitter)));
 
   return {
     role,
