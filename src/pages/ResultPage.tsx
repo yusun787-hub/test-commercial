@@ -6,7 +6,7 @@ import ShareModal from '../components/ShareModal';
 import { calculateQuizResult } from '../lib/quiz-config';
 import { getRoleAdviceModules } from '../lib/role-advice-modules';
 import { getRoleThoughtModules } from '../lib/role-thought-modules';
-import { getRoleLoveViewModules } from '../lib/role-love-view-modules';
+import { getRoleLoveViewModules, getRoleLoveViewShareText } from '../lib/role-love-view-modules';
 import { defaultRoleTheme, roleThemes } from '../lib/role-themes';
 
 const ANSWER_STORAGE_KEY = 'tv-character-quiz-answers';
@@ -303,7 +303,7 @@ export default function ResultPage() {
         roleSource={primaryRole.source}
         similarity={similarity}
         dimensions={dimensions}
-        loveView={profile.loveView}
+        loveView={getRoleLoveViewShareText(primaryRole)}
       />
     </div>
   );
