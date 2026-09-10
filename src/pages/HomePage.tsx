@@ -31,12 +31,6 @@ export default function HomePage() {
             开始测试
             <ArrowRight className="h-4 w-4" />
           </Link>
-          <Link
-            to="/result"
-            className="inline-flex items-center gap-2 rounded-full border border-sky-300/70 bg-white/60 px-5 py-3 text-sm font-medium text-sky-700 transition hover:bg-white/90"
-          >
-            预览结果页
-          </Link>
         </div>
       </section>
     </div>
