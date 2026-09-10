@@ -185,21 +185,7 @@ export function getRoleLoveViewModules(role: RoleSummary): LoveViewModule[] {
   ];
 }
 
-const SHARE_TEXT_MAX_LENGTH = 60;
-
 export function getRoleLoveViewShareText(role: RoleSummary): string {
   const [{ title, body }] = getRoleLoveViewModules(role);
-  const sentences = body.match(/[^。！？]+[。！？]?/g)?.map((sentence) => sentence.trim()).filter(Boolean) ?? [];
-  let summary = '';
-
-  for (const sentence of sentences.slice(0, 2)) {
-    if (`${summary}${sentence}`.length > SHARE_TEXT_MAX_LENGTH) break;
-    summary += sentence;
-  }
-
-  if (summary.length >= 20) return summary;
-
-  const fallback = `${title}。${sentences[0] ?? body}`;
-  if (fallback.length <= SHARE_TEXT_MAX_LENGTH) return fallback;
-  return `${fallback.slice(0, SHARE_TEXT_MAX_LENGTH - 1).replace(/[，、；：]$/, '')}…`;
+  return `${title}\n${body}`.trim();
 }

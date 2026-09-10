@@ -92,7 +92,7 @@ export default function ShareModal({ open, onClose, roleId, roleName, roleSource
         </div>
 
         {/* 分享图内容区 */}
-        <div className={`mt-4 overflow-hidden rounded-2xl border border-white/70 bg-gradient-to-br ${theme.hero} p-5`}>
+        <div className={`mt-4 h-auto rounded-2xl border border-white/70 bg-gradient-to-br ${theme.hero} p-5`}>
           {/* 品牌 + 主结果 */}
           <p className="text-center text-[10px] uppercase tracking-widest text-slate-400">蓝瞳测评局</p>
           <h3 className="mt-2 text-center text-lg font-semibold text-slate-800">
@@ -133,7 +133,7 @@ export default function ShareModal({ open, onClose, roleId, roleName, roleSource
           {/* 他的恋爱观 */}
           <div className="mt-4 rounded-xl bg-white/70 p-3">
             <p className="text-[10px] font-medium text-slate-500">他的恋爱观</p>
-            <p className="mt-1.5 text-xs leading-5 text-slate-600">{loveView}</p>
+            <p className="mt-1.5 whitespace-pre-line break-words text-xs leading-5 text-slate-600">{loveView}</p>
           </div>
         </div>
 
