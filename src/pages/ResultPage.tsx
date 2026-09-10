@@ -260,7 +260,6 @@ export default function ResultPage() {
         >
           <SectionHeader
             title="相处建议"
-            description="结合他的恋爱观和你的偏好，给出 5 条像闺蜜聊天一样有温度的相处思路。"
             accentBar={accentBar}
             accentText={theme.accentText}
           />
