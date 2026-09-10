@@ -135,9 +135,6 @@ export default function ShareModal({ open, onClose, roleId, roleName, roleSource
             <p className="text-[10px] font-medium text-slate-500">他的恋爱观</p>
             <p className="mt-1.5 text-xs leading-5 text-slate-600">{loveView}</p>
           </div>
-
-          {/* 底部水印 */}
-          <p className="mt-4 text-center text-[9px] text-slate-400">扫码测测你的另一半是谁 · 蓝瞳测评局</p>
         </div>
 
         {/* 下载按钮 */}
