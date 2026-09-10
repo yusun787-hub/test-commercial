@@ -18,6 +18,11 @@ export default function HomePage() {
           {pageMeta.subtitle}
         </p>
 
+        <div className="mt-5 space-y-2 rounded-2xl border border-white/70 bg-white/45 px-4 py-3 text-sm leading-6 text-slate-700 sm:mt-6 sm:px-5 sm:py-4 sm:text-base">
+          <p>用 24 道剧情题，读懂 TA 在恋爱里的真实模式。</p>
+          <p>对照真实影视角色拆解，并给出能直接用在日常相处中的建议。</p>
+        </div>
+
         <div className="mt-6 flex flex-wrap gap-3 sm:mt-8">
           <Link
             to="/quiz"
