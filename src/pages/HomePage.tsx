@@ -1,4 +1,4 @@
-import { ArrowRight, Clapperboard, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { pageMeta } from '../lib/quiz-config';
 
@@ -39,23 +39,6 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
-
-      {/* 开发信息提示 - 仅桌面端展示 */}
-      <div className="mt-6 hidden w-full max-w-2xl rounded-[1.5rem] border border-white/70 bg-white/55 p-5 backdrop-blur-xl sm:block sm:rounded-[2rem] sm:p-6">
-        <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-sky-200/60 p-2.5 text-sky-700">
-            <Clapperboard className="h-5 w-5" />
-          </div>
-          <div>
-            <p className="text-sm text-slate-500">首版重点</p>
-            <p className="text-base font-semibold text-slate-800">页面骨架 + 交互跑通</p>
-          </div>
-        </div>
-        <ul className="mt-4 space-y-2 text-sm leading-7 text-slate-600">
-          <li>• 当前版本：已接入完整 24 题题库与真实结果计算</li>
-          <li>• 下一步：接 Supabase 记录结果与埋点</li>
-        </ul>
-      </div>
     </div>
   );
 }
