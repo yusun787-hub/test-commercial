@@ -887,5 +887,5 @@ export function calculateQuizResult(selectedMap: Record<number, string>) {
 
 export const pageMeta = {
   title: '测测TA是电视剧中的谁',
-  subtitle: '24 道剧情题，耗时约10min，揭晓TA内心的恋爱观和相处秘诀。',
+  subtitle: '结合最专业的心理学模型综合分析，帮你更准确地读懂自己，给出独一无二的指导建议。',
 };
