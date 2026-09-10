@@ -48,8 +48,8 @@ function Paragraphs({
 
   return (
     <div className="space-y-3 sm:space-y-4">
-      {paragraphs.map((p, idx) => (
-        <p key={idx} className={`whitespace-pre-line ${textCls}`}>
+      {paragraphs.map((p) => (
+        <p key={p} className={`whitespace-pre-line ${textCls}`}>
           {p}
         </p>
       ))}
@@ -124,7 +124,7 @@ export default function ResultPage() {
 
   return (
     <div
-      className={`-mx-4 -my-4 min-h-screen bg-gradient-to-br ${theme.page} px-4 py-4 transition-colors duration-500 sm:-mx-6 sm:-my-6 sm:px-6 sm:py-6`}
+      className={`min-h-screen bg-gradient-to-br ${theme.page} px-3 py-3 transition-colors duration-500 sm:px-6 sm:py-6`}
     >
       {/* 英雄区 + 数据区（贴近） */}
       <div className="space-y-5 sm:space-y-6">
@@ -178,7 +178,7 @@ export default function ResultPage() {
 
         {/* 数据区：关系原型得分 - 雷达图 */}
         <section
-          className={`rounded-[1.5rem] border ${theme.card} p-5 backdrop-blur-xl sm:rounded-[2rem] sm:p-6`}
+          className={`rounded-[1.5rem] border ${theme.card} p-4 backdrop-blur-xl sm:rounded-[2rem] sm:p-6`}
         >
           <SectionHeader
             title="关系原型得分"

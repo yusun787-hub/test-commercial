@@ -35,10 +35,10 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
   const minPoint = dataPoints[minIndex];
 
   return (
-    <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-6">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
       {/* SVG 雷达图 */}
-      <div className="flex flex-col items-center">
-        <svg viewBox="0 0 240 240" className="h-48 w-48 shrink-0 sm:h-56 sm:w-56">
+      <div className="flex w-full flex-col items-center sm:w-auto">
+        <svg viewBox="0 0 240 240" className="h-52 w-52 shrink-0 sm:h-56 sm:w-56">
           {/* 网格 */}
           {gridLevels.map((level) => {
             const points = Array.from({ length: count }, (_, i) => getPoint(i, level));
@@ -47,9 +47,9 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
           })}
 
           {/* 轴线 */}
-          {dimensions.map((_, i) => {
+          {dimensions.map((dimension, i) => {
             const p = getPoint(i, 1);
-            return <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="rgba(56,189,248,0.2)" strokeWidth="1" />;
+            return <line key={dimension.label} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="rgba(56,189,248,0.2)" strokeWidth="1" />;
           })}
 
           {/* 测评结果区域 */}
@@ -60,7 +60,13 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
 
           {/* 数据点 */}
           {dataPoints.map((p, i) => (
-            <circle key={i} cx={p.x} cy={p.y} r={i === maxIndex ? '6' : '4'} fill={i === maxIndex ? '#ec4899' : '#f472b6'} />
+            <circle
+              key={dimensions[i]?.label ?? `${p.x}-${p.y}`}
+              cx={p.x}
+              cy={p.y}
+              r={i === maxIndex ? '6' : '4'}
+              fill={i === maxIndex ? '#ec4899' : '#f472b6'}
+            />
           ))}
 
           {/* 最优势与最劣势维度标注 */}
@@ -76,7 +82,7 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
             const labelPoint = getPoint(i, 1.2);
             return (
               <text
-                key={i}
+                key={d.label}
                 x={labelPoint.x}
                 y={labelPoint.y}
                 textAnchor="middle"
@@ -103,7 +109,7 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
       </div>
 
       {/* 维度解读 */}
-      <div className="flex-1 space-y-2.5">
+      <div className="w-full flex-1 space-y-2.5">
         {dimensions.map((d, i) => (
           <div
             key={d.label}
