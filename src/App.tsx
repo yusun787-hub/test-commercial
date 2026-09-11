@@ -35,6 +35,7 @@ function AccessGate() {
   const location = useLocation();
   const navigate = useNavigate();
   const [status, setStatus] = useState<'checking' | 'granted' | 'denied'>('checking');
+  const [deniedReason, setDeniedReason] = useState<'missing' | 'invalid' | 'expired' | 'error'>('invalid');
 
   useEffect(() => {
     let alive = true;
@@ -51,6 +52,7 @@ function AccessGate() {
       const tokenToCheck = urlToken ?? storedToken;
 
       if (!tokenToCheck) {
+        setDeniedReason('missing');
         setStatus('denied');
         return;
       }
@@ -69,6 +71,7 @@ function AccessGate() {
         }
       } else {
         clearStoredToken();
+        setDeniedReason(result.reason);
         setStatus('denied');
       }
     }
@@ -78,7 +81,7 @@ function AccessGate() {
     return () => {
       alive = false;
     };
-  }, [location.search, navigate]);
+  }, [location.pathname, location.search, navigate]);
 
   if (status === 'checking') {
     return (
@@ -90,7 +93,7 @@ function AccessGate() {
     );
   }
 
-  if (status === 'denied') return <ExpiredAccessPage />;
+  if (status === 'denied') return <ExpiredAccessPage reason={deniedReason} />;
 
   return <AppShell />;
 }

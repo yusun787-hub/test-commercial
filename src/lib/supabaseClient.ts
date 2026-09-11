@@ -8,4 +8,31 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('缺少 Supabase 环境变量：请配置 VITE_SUPABASE_URL 与 VITE_SUPABASE_ANON_KEY');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabaseFetch: typeof fetch = (input, init) => {
+  const headers = new Headers(init?.headers ?? undefined);
+
+  // 兜底补齐 apikey，避免任何请求因 header 丢失而直接暴露 Supabase 原始 JSON 错误。
+  if (!headers.has('apikey')) {
+    headers.set('apikey', supabaseAnonKey);
+  }
+
+  // 对匿名请求也显式补 Bearer，确保 REST / Auth / Realtime 相关请求头一致。
+  if (!headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${supabaseAnonKey}`);
+  }
+
+  return fetch(input, {
+    ...init,
+    headers,
+  });
+};
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  global: {
+    fetch: supabaseFetch,
+    headers: {
+      apikey: supabaseAnonKey,
+      Authorization: `Bearer ${supabaseAnonKey}`,
+    },
+  },
+});
