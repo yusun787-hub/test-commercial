@@ -34,6 +34,18 @@ function isExpired(expiresAt: string) {
   return t <= Date.now();
 }
 
+const VALIDITY_OPTIONS = [
+  { days: 3, label: '3 天' },
+  { days: 30, label: '30 天' },
+] as const;
+
+function validityDays(createdAt: string, expiresAt: string) {
+  const start = new Date(createdAt).getTime();
+  const end = new Date(expiresAt).getTime();
+  if (Number.isNaN(start) || Number.isNaN(end)) return null;
+  return Math.round((end - start) / (1000 * 60 * 60 * 24));
+}
+
 export default function AdminPage() {
   const expectedPassword = import.meta.env.VITE_ADMIN_PASSWORD as string | undefined;
 
@@ -43,6 +55,7 @@ export default function AdminPage() {
   const [rows, setRows] = useState<TokenRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [validity, setValidity] = useState<number>(30);
   const [newLink, setNewLink] = useState<string>('');
   const [error, setError] = useState<string>('');
 
@@ -78,7 +91,7 @@ export default function AdminPage() {
 
     try {
       const token = generateTokenHex(16);
-      const expiresAt = addDays(new Date(), 30).toISOString();
+      const expiresAt = addDays(new Date(), validity).toISOString();
 
       const { error } = await supabase.from('access_tokens').insert({
         token,
@@ -173,8 +186,31 @@ export default function AdminPage() {
           <>
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/70 bg-white/55 p-5">
               <div>
-                <div className="text-sm text-slate-600">默认有效期</div>
-                <div className="mt-1 text-base font-medium text-slate-800">30 天</div>
+                <div className="text-sm text-slate-600">有效期</div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {VALIDITY_OPTIONS.map((opt) => {
+                    const active = validity === opt.days;
+                    return (
+                      <label
+                        key={opt.days}
+                        className={
+                          active
+                            ? 'inline-flex cursor-pointer items-center gap-2 rounded-full border border-pink-300 bg-pink-100/80 px-4 py-2 text-sm font-medium text-pink-700 transition'
+                            : 'inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/70 bg-white/70 px-4 py-2 text-sm text-slate-600 transition hover:bg-white'
+                        }
+                      >
+                        <input
+                          type="radio"
+                          name="validity"
+                          className="accent-pink-500"
+                          checked={active}
+                          onChange={() => setValidity(opt.days)}
+                        />
+                        {opt.label}
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
               <button
                 type="button"
@@ -222,6 +258,7 @@ export default function AdminPage() {
                   rows.map((row) => {
                     const link = `${window.location.origin}/?token=${row.token}`;
                     const expired = isExpired(row.expires_at);
+                    const days = validityDays(row.created_at, row.expires_at);
 
                     return (
                       <div key={row.token} className="px-5 py-4">
@@ -237,6 +274,11 @@ export default function AdminPage() {
                               >
                                 {expired ? '已过期' : '有效'}
                               </span>
+                              {days !== null && (
+                                <span className="rounded-full bg-sky-100 px-2.5 py-1 text-xs text-sky-700">
+                                  有效期 {days} 天
+                                </span>
+                              )}
                               <span className="text-xs text-slate-500">
                                 创建：{formatDateTime(row.created_at)}
                               </span>
