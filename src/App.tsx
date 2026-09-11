@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage';
 import LoadingPage from './pages/LoadingPage';
 import QuizPage from './pages/QuizPage';
 import ResultPage from './pages/ResultPage';
+import AdminPage from './pages/AdminPage';
 import ExpiredAccessPage from './pages/ExpiredAccessPage';
 import {
   clearStoredToken,
@@ -23,6 +24,7 @@ function AppShell() {
           <Route path="/quiz" element={<QuizPage />} />
           <Route path="/loading" element={<LoadingPage />} />
           <Route path="/result" element={<ResultPage />} />
+          <Route path="/admin" element={<AdminPage />} />
         </Routes>
       </main>
     </div>
@@ -38,6 +40,12 @@ function AccessGate() {
     let alive = true;
 
     async function run() {
+      // 管理页不需要付费 token（只靠管理密码保护），否则会被全站 token gate 拦住。
+      if (location.pathname.startsWith('/admin')) {
+        setStatus('granted');
+        return;
+      }
+
       const urlToken = readTokenFromUrl(location.search);
       const storedToken = getStoredToken();
       const tokenToCheck = urlToken ?? storedToken;
