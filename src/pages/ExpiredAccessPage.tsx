@@ -21,12 +21,10 @@ export default function ExpiredAccessPage({ reason }: Props) {
               当前网络无法连接验证服务
             </h1>
             <p className="mt-4 text-base leading-7 text-slate-600">
-              我们需要访问 Supabase 来校验你的 token，但你当前网络环境可能无法解析或访问
-              <span className="break-all"> wrxptduwsnivppotjtox.supabase.co </span>
-              （常见于 DNS 污染/跨境网络不稳定/公司网络策略）。
+              访问验证服务暂时不可用，请稍后重试。
             </p>
             <p className="mt-3 text-base leading-7 text-slate-600">
-              你可以尝试：切换网络（4G/热点）、更换 DNS（如 1.1.1.1 / 8.8.8.8）、或稍后重试。
+              如果问题持续存在，请联系蓝瞳测评局获取帮助。
             </p>
           </>
         ) : (
