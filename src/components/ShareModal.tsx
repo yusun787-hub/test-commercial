@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+import { toPng } from 'html-to-image';
 import { Download, X } from 'lucide-react';
 import { defaultRoleTheme, roleThemes, type RoleTheme } from '../lib/role-themes';
 
@@ -67,14 +69,40 @@ function MiniRadar({ dimensions, theme }: { dimensions: Dimension[]; theme: Role
   );
 }
 
+function sanitizeFilename(name: string) {
+  const cleaned = name
+    .trim()
+    // Windows/macOS 常见非法字符
+    .replace(/[\\/:*?"<>|]/g, '')
+    // 控制字符
+    .replace(/[\u0000-\u001F]/g, '');
+
+  return cleaned || 'share';
+}
+
 export default function ShareModal({ open, onClose, roleId, roleName, roleSource, similarity, dimensions, loveView }: ShareModalProps) {
   const theme = roleThemes[roleId] ?? defaultRoleTheme;
+  const captureRef = useRef<HTMLDivElement>(null);
 
   if (!open) return null;
 
-  const handleDownload = () => {
-    // TODO: 后续接 html2canvas 真实生成图片并下载
-    alert('下载功能将在接入 html2canvas 后可用');
+  const handleDownload = async () => {
+    if (!captureRef.current) return;
+
+    try {
+      const dataUrl = await toPng(captureRef.current, {
+        cacheBust: true,
+        pixelRatio: 2,
+      });
+
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = `${sanitizeFilename(roleName)}.png`;
+      link.click();
+    } catch (err) {
+      console.error('[ShareModal] download failed', err);
+      alert('下载失败，请重试');
+    }
   };
 
   return (
@@ -92,7 +120,7 @@ export default function ShareModal({ open, onClose, roleId, roleName, roleSource
         </div>
 
         {/* 分享图内容区 */}
-        <div className={`mt-4 h-auto rounded-2xl border border-white/70 bg-gradient-to-br ${theme.hero} p-5`}>
+        <div ref={captureRef} className={`mt-4 h-auto rounded-2xl border border-white/70 bg-gradient-to-br ${theme.hero} p-5`}>
           {/* 品牌 + 主结果 */}
           <p className="text-center text-[10px] uppercase tracking-widest text-slate-400">蓝瞳测评局</p>
           <h3 className="mt-2 text-center text-lg font-semibold text-slate-800">
