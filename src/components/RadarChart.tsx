@@ -4,16 +4,19 @@ interface RadarChartProps {
 
 export default function RadarChart({ dimensions }: RadarChartProps) {
   const count = dimensions.length;
-  const cx = 120;
-  const cy = 120;
-  const radius = 90;
+  const svgSize = 300;
+  const cx = svgSize / 2;
+  const cy = svgSize / 2;
+  const radius = 92;
+  const labelRadius = radius + 34;
 
   // 计算多边形顶点坐标
-  const getPoint = (index: number, scale: number) => {
+  const getPoint = (index: number, scale: number, baseRadius = radius) => {
     const angle = (Math.PI * 2 * index) / count - Math.PI / 2;
     return {
-      x: cx + radius * scale * Math.cos(angle),
-      y: cy + radius * scale * Math.sin(angle),
+      x: cx + baseRadius * scale * Math.cos(angle),
+      y: cy + baseRadius * scale * Math.sin(angle),
+      angle,
     };
   };
 
@@ -38,7 +41,7 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
       {/* SVG 雷达图 */}
       <div className="flex w-full flex-col items-center sm:w-auto">
-        <svg viewBox="0 0 240 240" className="h-52 w-52 shrink-0 sm:h-56 sm:w-56">
+        <svg viewBox={`0 0 ${svgSize} ${svgSize}`} className="h-64 w-64 shrink-0 overflow-visible sm:h-72 sm:w-72">
           {/* 网格 */}
           {gridLevels.map((level) => {
             const points = Array.from({ length: count }, (_, i) => getPoint(i, level));
@@ -79,18 +82,37 @@ export default function RadarChart({ dimensions }: RadarChartProps) {
 
           {/* 标签 */}
           {dimensions.map((d, i) => {
-            const labelPoint = getPoint(i, 1.2);
+            const labelPoint = getPoint(i, 1, labelRadius);
+            const cos = Math.cos(labelPoint.angle);
+            const sin = Math.sin(labelPoint.angle);
+            const isNearVertical = Math.abs(cos) < 0.35;
+            const isLeftSide = cos < -0.35;
+            const labelX = labelPoint.x + (isNearVertical ? 0 : cos > 0 ? 12 : -12);
+            const labelY = labelPoint.y + (sin > 0.35 ? 10 : sin < -0.35 ? -10 : 0);
+            const textAnchor = isNearVertical ? 'middle' : isLeftSide ? 'end' : 'start';
+
             return (
-              <text
-                key={d.label}
-                x={labelPoint.x}
-                y={labelPoint.y}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                className="fill-slate-500 text-[9px] sm:text-[10px]"
-              >
-                {d.label}
-              </text>
+              <g key={d.label}>
+                <rect
+                  x={labelX - (isNearVertical ? 28 : isLeftSide ? 52 : 4)}
+                  y={labelY - 11}
+                  width="56"
+                  height="22"
+                  rx="11"
+                  fill="rgba(255,255,255,0.85)"
+                />
+                <text
+                  x={labelX}
+                  y={labelY}
+                  textAnchor={textAnchor}
+                  dominantBaseline="middle"
+                  fill="#475569"
+                  fontSize="12"
+                  fontWeight="500"
+                >
+                  {d.label}
+                </text>
+              </g>
             );
           })}
         </svg>
