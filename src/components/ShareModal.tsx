@@ -24,13 +24,15 @@ interface ShareModalProps {
 // 迷你雷达图 - 专用于分享图
 function MiniRadar({ dimensions, theme }: { dimensions: Dimension[]; theme: RoleTheme }) {
   const count = dimensions.length;
-  const cx = 80;
-  const cy = 80;
-  const radius = 60;
+  const svgSize = 220;
+  const cx = svgSize / 2;
+  const cy = svgSize / 2;
+  const radius = 68;
+  const labelRadius = radius + 24;
 
-  const getPoint = (index: number, scale: number) => {
+  const getPoint = (index: number, scale: number, baseRadius = radius) => {
     const angle = (Math.PI * 2 * index) / count - Math.PI / 2;
-    return { x: cx + radius * scale * Math.cos(angle), y: cy + radius * scale * Math.sin(angle) };
+    return { x: cx + baseRadius * scale * Math.cos(angle), y: cy + baseRadius * scale * Math.sin(angle), angle };
   };
 
   const gridLevels = [0.5, 1];
@@ -42,27 +44,53 @@ function MiniRadar({ dimensions, theme }: { dimensions: Dimension[]; theme: Role
   const avgPath = avgPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
 
   return (
-    <svg viewBox="0 0 160 160" className="h-32 w-32">
+    <svg viewBox={`0 0 ${svgSize} ${svgSize}`} className="h-40 w-40 overflow-visible">
       {gridLevels.map((level) => {
         const points = Array.from({ length: count }, (_, i) => getPoint(i, level));
         const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
         return <path key={level} d={path} fill="none" stroke="rgba(56,189,248,0.3)" strokeWidth="1" />;
       })}
-      {dimensions.map((_, i) => {
+      {dimensions.map((dimension, i) => {
         const p = getPoint(i, 1);
-        return <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="rgba(56,189,248,0.2)" strokeWidth="1" />;
+        return <line key={dimension.label} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="rgba(56,189,248,0.2)" strokeWidth="1" />;
       })}
       <path d={dataPath} fill={theme.radarFill} stroke={theme.radar} strokeWidth="1.5" />
       <path d={avgPath} fill="none" stroke="rgba(56,189,248,0.8)" strokeWidth="1" strokeDasharray="3 2" />
-      {dataPoints.map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r="2.5" fill={theme.radar} />
+      {dataPoints.map((point, i) => (
+        <circle key={dimensions[i]?.label ?? `${point.x}-${point.y}`} cx={point.x} cy={point.y} r="2.5" fill={theme.radar} />
       ))}
       {dimensions.map((d, i) => {
-        const lp = getPoint(i, 1.3);
+        const labelPoint = getPoint(i, 1, labelRadius);
+        const cos = Math.cos(labelPoint.angle);
+        const sin = Math.sin(labelPoint.angle);
+        const isNearVertical = Math.abs(cos) < 0.35;
+        const isLeftSide = cos < -0.35;
+        const labelX = labelPoint.x + (isNearVertical ? 0 : cos > 0 ? 8 : -8);
+        const labelY = labelPoint.y + (sin > 0.35 ? 7 : sin < -0.35 ? -7 : 0);
+        const textAnchor = isNearVertical ? 'middle' : isLeftSide ? 'end' : 'start';
+
         return (
-          <text key={i} x={lp.x} y={lp.y} textAnchor="middle" dominantBaseline="middle" className="fill-slate-500 text-[8px]">
-            {d.label}
-          </text>
+          <g key={d.label}>
+            <rect
+              x={labelX - (isNearVertical ? 22 : isLeftSide ? 42 : 4)}
+              y={labelY - 8}
+              width="46"
+              height="16"
+              rx="8"
+              fill="rgba(255,255,255,0.88)"
+            />
+            <text
+              x={labelX}
+              y={labelY}
+              textAnchor={textAnchor}
+              dominantBaseline="middle"
+              fill="#475569"
+              fontSize="8"
+              fontWeight="500"
+            >
+              {d.label}
+            </text>
+          </g>
         );
       })}
     </svg>
@@ -75,7 +103,7 @@ function sanitizeFilename(name: string) {
     // Windows/macOS 常见非法字符
     .replace(/[\\/:*?"<>|]/g, '')
     // 控制字符
-    .replace(/[\u0000-\u001F]/g, '');
+    .replace(/[^\x20-\x7E\u0080-\uFFFF]/g, '');
 
   return cleaned || 'share';
 }
